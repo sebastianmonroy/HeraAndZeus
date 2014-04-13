@@ -129,6 +129,7 @@ public class Player : MonoBehaviour {
 		hand.Remove(card);
 
 		ArrangeHand();
+		card.Flip();
 		return true;
 		
 	}
