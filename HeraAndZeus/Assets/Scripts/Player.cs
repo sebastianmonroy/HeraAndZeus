@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -87,32 +87,46 @@ public class Player : MonoBehaviour {
 	}
 
 	public bool Discard(Card card){
-		foreach (FieldSpot spot in playField){
-			if (spot.card == card){
-				discardPile.Add(card);
-				card.Flip(false);
-				card.MoveTo(discardPilePos);
-				card.inField = false;
-				spot.card = null;
-				ArrangeField();
-				return true;
-			}
+		FieldSpot spot = FindOnField(card);
+		if (spot != null){
+			discardPile.Add(card);
+			card.Flip(false);
+			card.MoveTo(discardPilePos);
+			card.inField = false;
+			spot.card = null;
+			ArrangeField();
+			return true;
 		}
+
 		return false;
 	}
 	
 	
-	public bool Play(Card card, int col){
-		FieldSpot spot = NextAvailableSpot(col);
-		if (spot == null)
-			return false;
-		else{
-			card.Flip(false);
-			spot.card = card;
-			card.MoveTo(spot.transform.position + Vector3.up * 2);
-			card.spot = spot;
-			hand.Remove(card);
+	public bool Play(Card card, FieldSpot spot){
+
+		if (spot.card != null){//there is already a card in the target spot
+
+			if (NextAvailableSpot(spot.col) == null){ //the column is full
+
+				return false; //play unsuccessful
+			}		
+			else{//move every card in the target row or higher down a row to make room
+				for (int row = 2; row >= spot.row; row--){
+					if (playField[row,spot.col].card != null){
+						playField[row+1,spot.col].card = playField[row,spot.col].card;
+						playField[row,spot.col].card = null;
+						playField[row+1,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2);
+					}
+				}
+			}
 		}
+		else{ // this spot is unoccupied
+			spot = NextAvailableSpot(spot.col); //ge the next available spot in this column
+		}
+
+		spot.card = card;
+		card.MoveTo(spot.transform.position + Vector3.up * 2);
+		hand.Remove(card);
 
 		ArrangeHand();
 		return true;
@@ -251,10 +265,13 @@ public class Player : MonoBehaviour {
 	}
 
 	//Will eliminate gaps in the play field, push everything to the top of its column
-	void ArrangeField(){
+	public void ArrangeField(){
 		for (int col = 0; col < 3; col++){
+			if (NextAvailableSpot(col) != null){ // if the column is not full
 			for (int row = 0; row < 4; row++){
-				if (playField[row,col].card != null){
+				FieldSpot spot = playField[row,col];
+				if (spot.card != null){
+					spot.card.MoveTo(spot.transform.position + Vector3.up * 2); //make sure everything is moving to its proper spot
 					FieldSpot nextSpot = NextAvailableSpot(col);
 					if (nextSpot.row < row){
 						Card current = playField[row,col].card;
@@ -264,6 +281,7 @@ public class Player : MonoBehaviour {
 						current.spot = nextSpot;
 					}
 				}
+			}
 			}
 		}
 	}
@@ -277,6 +295,26 @@ public class Player : MonoBehaviour {
 		return null;
 	}
 
+	public bool MakeGap(FieldSpot spot){
+		//ArrangeField();
+		if (NextAvailableSpot(spot.col) == null) return false;
+
+		for (int row = 2; row >= spot.row; row--){
+			if (playField[row,spot.col].card != null){
+				playField[row,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2);
+			}
+		}
+		return true;
+	}
+
+	public bool OwnsFieldSpot (FieldSpot spot){
+		foreach (FieldSpot s in playField){
+			if (s == spot) return true;
+		}
+		return false;
+	}
+
+	/*
 	public void Insert(Card oldCard, Card newCard) {
 		if (oldCard.spot.row < 4) {
 			int col = oldCard.spot.col;
@@ -293,4 +331,5 @@ public class Player : MonoBehaviour {
 			Play(newCard, oldCard.spot.col);
 		}
 	}
+	*/
 }

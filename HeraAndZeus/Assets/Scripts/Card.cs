@@ -36,7 +36,7 @@ public class Card : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		type = CardType.NONE;
+		//type = CardType.NONE;
 		name = type.ToString();
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
 	}
@@ -45,7 +45,8 @@ public class Card : MonoBehaviour {
 	void Update () {
 		if (moving) {
 			this.transform.position = Vector3.Lerp(this.transform.position, destination, 0.1f);
-			if (Vector3.Distance(this.transform.position, destination) <= 0.01f) {
+			if (Vector3.Distance(this.transform.position, destination) <= 0.1f) {
+				this.transform.position = destination;
 				moving = false;
 				inField = true;
 			}
