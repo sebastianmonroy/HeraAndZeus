@@ -9,6 +9,7 @@ public class GameHandler : MonoBehaviour {
 	Player activePlayer;
 
 	public Card selectedCard;
+	public Card heldCard;
 
 	public static GameHandler Instance;
 
@@ -60,7 +61,7 @@ public class GameHandler : MonoBehaviour {
 		*/
 
 
-		if (leftClick){
+		if (leftClick && heldCard == null) {
 			if (hit.transform.tag == "Card") {
 				Card chosen = hit.transform.GetComponent<Card>();
 				if (activePlayer.hand.Contains(chosen)){
@@ -87,11 +88,27 @@ public class GameHandler : MonoBehaviour {
 			}
 		} else if (scrollUp) {
 			if (hit.transform.tag == "Card") {
-				hit.transform.gameObject.GetComponent<Card>().HoldUp(true);
+				Card card = hit.transform.gameObject.GetComponent<Card>();
+				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
+					if (heldCard != null && heldCard.isPickedUp) {
+						// put down currently held up card
+						heldCard.HoldUp(false);
+
+						// hold up card
+						card.HoldUp(true);
+						heldCard = card;
+					} else if (heldCard == null) {
+						// hold up card
+						card.HoldUp(true);
+						heldCard = card;
+					}
+				}
 			}
 		} else if (scrollDown) {
-			if (hit.transform.tag == "Card") {
-				hit.transform.gameObject.GetComponent<Card>().HoldUp(false);
+			if (hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard != null && heldCard.isPickedUp) {
+				// put down held card if it is already picked up
+				heldCard.HoldUp(false);
+				heldCard = null;
 			}
 		}
 

@@ -107,9 +107,8 @@ public class Card : MonoBehaviour {
 	}
 
 	public void HoldUp(bool pickBool) {
-		if (pickBool != isPickedUp) {
+		if (pickBool != isPickedUp && isFlipped) {
 			picking = true;
-			moving = false;
 			if (isPickedUp) {
 				destination = originalPosition;
 				desiredScale = originalScale;
