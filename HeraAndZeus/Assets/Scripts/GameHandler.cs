@@ -64,7 +64,9 @@ public class GameHandler : MonoBehaviour {
 		if (leftClick && heldCard == null) {
 			if (hit.transform.tag == "Card") {
 				Card chosen = hit.transform.GetComponent<Card>();
-				if (activePlayer.hand.Contains(chosen)){
+				if (selectedCard != null && selectedCard == chosen) {
+					selectedCard = null;
+				} else if (activePlayer.hand.Contains(chosen)){
 					selectedCard = chosen;
 				} else if (activePlayer.drawPile.Contains(chosen)){
 					activePlayer.Draw();
@@ -74,10 +76,7 @@ public class GameHandler : MonoBehaviour {
 					activePlayer.Play(selectedCard, activePlayer.FindOnField(chosen));
 					selectedCard = null;
 				}
-			}
-
-
-			if (hit.transform.tag == "Spot") {
+			} else if (hit.transform.tag == "Spot") {
 				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
 				if (activePlayer.playField[chosen.row, chosen.col] == chosen){ //does this spot belong to the active player
 					if (selectedCard != null){
@@ -97,10 +96,14 @@ public class GameHandler : MonoBehaviour {
 						// hold up card
 						card.HoldUp(true);
 						heldCard = card;
+
+						selectedCard = null;
 					} else if (heldCard == null) {
 						// hold up card
 						card.HoldUp(true);
 						heldCard = card;
+
+						selectedCard = null;
 					}
 				}
 			}
