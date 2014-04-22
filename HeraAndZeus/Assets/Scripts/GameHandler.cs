@@ -36,6 +36,8 @@ public class GameHandler : MonoBehaviour {
 
 		bool leftClick = Input.GetMouseButtonDown(0);
 		bool rightClick = Input.GetMouseButtonDown(1);
+		bool scrollUp = Input.GetAxis("Mouse ScrollWheel") > 0;
+		bool scrollDown = Input.GetAxis("Mouse ScrollWheel") < 0;
 
 		activePlayer.ArrangeField();
 		if (overSpot != null){
@@ -59,8 +61,7 @@ public class GameHandler : MonoBehaviour {
 
 
 		if (leftClick){
-
-			if (hit.transform.tag == "Card"){
+			if (hit.transform.tag == "Card") {
 				Card chosen = hit.transform.GetComponent<Card>();
 				if (activePlayer.hand.Contains(chosen)){
 					selectedCard = chosen;
@@ -75,7 +76,7 @@ public class GameHandler : MonoBehaviour {
 			}
 
 
-			if (hit.transform.tag == "Spot"){
+			if (hit.transform.tag == "Spot") {
 				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
 				if (activePlayer.playField[chosen.row, chosen.col] == chosen){ //does this spot belong to the active player
 					if (selectedCard != null){
@@ -84,7 +85,14 @@ public class GameHandler : MonoBehaviour {
 					}
 				}
 			}
-			
+		} else if (scrollUp) {
+			if (hit.transform.tag == "Card") {
+				hit.transform.gameObject.GetComponent<Card>().HoldUp(true);
+			}
+		} else if (scrollDown) {
+			if (hit.transform.tag == "Card") {
+				hit.transform.gameObject.GetComponent<Card>().HoldUp(false);
+			}
 		}
 
 

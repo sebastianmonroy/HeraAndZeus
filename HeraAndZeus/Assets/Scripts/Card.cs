@@ -22,6 +22,11 @@ public class Card : MonoBehaviour {
 	public bool inField = false;
 	public bool flipping;
 	public bool isFlipped = false;
+	public bool picking;
+	public bool isPickedUp = false;
+	public Vector3 originalPosition;
+	public Vector3 originalScale;
+	public Vector3 desiredScale;
 
 	public bool typeSet = false;
 	Vector3 goalRotation;
@@ -39,6 +44,7 @@ public class Card : MonoBehaviour {
 		//type = CardType.NONE;
 		name = type.ToString();
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
+		originalScale = this.transform.localScale;
 	}
 	
 	// Update is called once per frame
@@ -50,6 +56,16 @@ public class Card : MonoBehaviour {
 				moving = false;
 				inField = true;
 			}
+		} else if (picking) {
+			this.transform.position = Vector3.Lerp(this.transform.position, destination, 0.1f);
+			this.transform.localScale = Vector3.Lerp(this.transform.localScale,desiredScale, 0.1f);
+			if (Vector3.Distance(this.transform.position, destination) <= 0.1f 
+					&& Vector3.Distance(this.transform.localScale, desiredScale) <= 0.1f) {
+				this.transform.position = destination;
+				picking = false;
+				isPickedUp = !isPickedUp;
+			}
+
 		}
 
 		if (flipping) {
@@ -88,6 +104,21 @@ public class Card : MonoBehaviour {
 	public void MoveTo(Vector3 dest){
 		moving = true;
 		destination = dest;
+	}
+
+	public void HoldUp(bool pickBool) {
+		if (pickBool != isPickedUp) {
+			picking = true;
+			moving = false;
+			if (isPickedUp) {
+				destination = originalPosition;
+				desiredScale = originalScale;
+			} else {
+				originalPosition = this.transform.position;
+				destination = Camera.main.transform.position - Vector3.up * 1;
+				desiredScale = 5 * originalScale;
+			}
+		}
 	}
 
 	public void Flip() {
