@@ -297,8 +297,8 @@ public class Player : MonoBehaviour {
 			hand.Add(drawPile[0]);
 			drawPile.RemoveAt(0);
 			ArrangeHand();
-			return true;
 			actionPoints --;
+			return true;
 		}
 		else return false;
 
