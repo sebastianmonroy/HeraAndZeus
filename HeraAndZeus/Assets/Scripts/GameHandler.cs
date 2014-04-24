@@ -17,8 +17,8 @@ public class GameHandler : MonoBehaviour {
 		Instance = this;
 		activePlayer = p2;
 
-		p1.actionPoints = 3;
-		p2.actionPoints = 3;
+		p1.actionPoints = 12;
+		p2.actionPoints = 12;
 	}
 	
 	// Update is called once per frame
