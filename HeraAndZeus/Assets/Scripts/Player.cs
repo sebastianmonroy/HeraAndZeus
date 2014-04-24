@@ -27,7 +27,7 @@ public class Player : MonoBehaviour {
 	public Card selectedCard;
 	public Card heldCard;
 
-	public bool setupPhase = true;
+	public bool setupPhase = false;
 
 	public TextMesh actionPointText;
 
@@ -170,6 +170,7 @@ public class Player : MonoBehaviour {
 		ArrangeField();
 		if (overSpot != null){
 			if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
+				if (FindOnField(selectedCard) == null)
 				MakeGap(overSpot);
 //				gapSpot = overSpot;
 			}
@@ -195,14 +196,30 @@ public class Player : MonoBehaviour {
 					SelectCard(null);
 				} else if (hand.Contains(chosen)){
 					SelectCard(chosen);
-
-				} else if (drawPile.Contains(chosen)){
+				} else if (FindOnField(chosen) != null){
+					SelectCard(chosen);
+				}else if (drawPile.Contains(chosen)){
 					Draw();
-				} else if ((FindOnField(chosen)) && selectedCard != null) {
-					// if player has clicked on a card in their hand and then a card in the field, insert card there
-					//Insert(chosen, activePlayer.);
-					Play(selectedCard, FindOnField(chosen));
-					SelectCard(null);
+				} else if (chosen != null && selectedCard != null) {
+					// player has selected card and chosen card
+					if (chosen.owner != this) {
+						Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
+
+						// clicked on enemy card
+						if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
+							// clicked on enemy card in same column as selected card
+//							Debug.Log("Context: " + 0 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
+							ResolveChallenge.resolve(0, selectedCard.type, chosen.type);
+						} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
+							// clicked own card in hand and then enemy card in hand
+//							Debug.Log("Context: " + 1 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
+							ResolveChallenge.resolve(1, selectedCard.type, chosen.type);
+						} else if (hand.Contains(selectedCard) && chosen.spot != null && chosen.spot.row == 0) {
+							// clicked own card in hand and then enemy card in front row of field
+//							Debug.Log("Context: " + 2 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
+							ResolveChallenge.resolve(2, selectedCard.type, chosen.type);
+						}
+					}
 				}
 			} else if (hit.transform.tag == "Spot") {
 				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
@@ -224,50 +241,28 @@ public class Player : MonoBehaviour {
 						// hold up card
 						card.HoldUp(true);
 						heldCard = card;
+						
 						SelectCard(null);
 					} else if (heldCard == null) {
 						// hold up card
 						card.HoldUp(true);
 						heldCard = card;
+						
 						SelectCard(null);
 					}
 				}
 			}
 		} else if (scrollDown) {
-			if (hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard != null && heldCard.isPickedUp) {
+			if (heldCard != null && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard.isPickedUp) {
 				// put down held card if it is already picked up
 				heldCard.HoldUp(false);
 				heldCard = null;
 			}
 		}
-		
-		
-		/*
-		if (Input.GetMouseButtonDown(1)){
-			
-			if (hit.transform.tag == "Card"){
-				Card chosen = hit.transform.GetComponent<Card>();
-				foreach (FieldSpot spot in activePlayer.playField){
-					if (spot.card == chosen){
-						chosen.Flip();
-					}
-				}
-			}
-		}
 
-		if (Input.GetMouseButtonDown(2)){ //Middle mouse click, useful for debug
-			if (hit.transform.tag == "Card"){
-				Card chosen = hit.transform.GetComponent<Card>();
-				foreach (FieldSpot spot in playField){
-					if (spot.card == chosen){
-						Discard(chosen);
-					}
-				}
-			}
+		if (rightClick){
+			SelectCard(null);
 		}
-		*/
-		
-		//ArrangeField();
 
 	}
 
@@ -343,6 +338,7 @@ public class Player : MonoBehaviour {
 		}
 
 		spot.card = card;
+		card.spot = spot;
 		card.MoveTo(spot.transform.position + Vector3.up * 2);
 		hand.Remove(card);
 
@@ -384,6 +380,7 @@ public class Player : MonoBehaviour {
 			Card c = GameObject.Instantiate(cardPrefab, drawPilePos, Quaternion.identity) as Card;
 			c.SetType(type);
 			c.SetFlip(false);
+			c.owner = this;
 			drawPile.Add(c);
 //			Debug.Log(c);
 		}

@@ -41,6 +41,8 @@ public class Card : MonoBehaviour {
 
 	public GameObject border;
 
+	public Player owner;
+
 	// Use this for initialization
 	void Start () {
 		border.renderer.enabled = false;

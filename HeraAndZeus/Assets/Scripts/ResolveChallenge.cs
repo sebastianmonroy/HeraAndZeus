@@ -73,7 +73,7 @@ public class ResolveChallenge : MonoBehaviour {
 	}
 
 	public static int resolve(int context, CardType attacker, CardType defender){
-		Debug.Log ("Resolve Number: " + resolveTable[context, (int)attacker, (int)defender]);
+		Debug.Log ("Challenge!" + "\nAttacker: " + attacker + "  Defender: " + defender + "  Resolution: " + resolveTable[context, (int)attacker, (int)defender]);
 		return resolveTable[context, (int)attacker, (int)defender];
 	}
 	
