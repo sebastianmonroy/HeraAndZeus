@@ -9,8 +9,7 @@ public enum PlayerType {
 public class Player : MonoBehaviour {
 	int buffer = 3;
 
-	public PlayerType type;
-	public bool humanControlled;
+	//public PlayerType type;
 	public int actionPoints;
 	private CardType[] deck = new CardType[43];
 	public List<Card> hand;
@@ -25,6 +24,13 @@ public class Player : MonoBehaviour {
 	Vector3 drawPilePos;
 	Vector3 discardPilePos;
 
+	public Card selectedCard;
+	public Card heldCard;
+
+	public bool setupPhase = true;
+
+	public TextMesh actionPointText;
+
 	
 
 	//Play(Card, int column);
@@ -32,7 +38,7 @@ public class Player : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start () {
+	protected void Start () {
 		hand = new List<Card>();
 		drawPile = new List<Card>();
 		discardPile = new List<Card>();
@@ -56,6 +62,8 @@ public class Player : MonoBehaviour {
 
 		ArrangeHand();
 
+		actionPointText.transform.position = this.transform.position - transform.right * 25 - transform.forward * 10;
+
 		//Debug.Log(Play (hand[0], 0));
 		//hand[0].Flip();
 	
@@ -63,13 +71,222 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		actionPointText.text = actionPoints.ToString();
+	}
+
+	public void SetupField(){
+
+		RaycastHit hit;
+		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+		Physics.Raycast(ray, out hit);
+		RaycastHit[] hitAll = Physics.RaycastAll(ray);
+
+		//Debug.Log(hit.collider.gameObject.name);
+		
+		bool leftClick = Input.GetMouseButtonDown(0);
+		bool rightClick = Input.GetMouseButtonDown(1);
+		bool scrollUp = Input.GetAxis("Mouse ScrollWheel") > 0;
+		bool scrollDown = Input.GetAxis("Mouse ScrollWheel") < 0;
+		
+		
+		if (leftClick && heldCard == null) {
+			if (hit.transform.tag == "Card") {
+				Card chosen = hit.transform.GetComponent<Card>();
+				if (selectedCard != null && selectedCard == chosen) {
+					SelectCard(null);
+				} else if (hand.Contains(chosen)){
+					//Debug.Log(name + " card chosen");
+					SelectCard(chosen);
+					//Debug.Log(name + " " + selectedCard);
+
+				} else if (drawPile.Contains(chosen)){
+					Draw();
+				} 
+			} else if (hit.transform.tag == "Spot") {
+				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
+				if (playField[chosen.row, chosen.col] == chosen && NextAvailableSpot(chosen.col).row == 0){ //does this spot belong to the active player, and is the selected column empty
+					if (selectedCard != null){
+						Play(selectedCard, chosen);
+						SelectCard(null);
+					}
+				}
+			}
+		} else if (scrollUp) {
+			if (hit.transform.tag == "Card") {
+				Card card = hit.transform.gameObject.GetComponent<Card>();
+				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
+					if (heldCard != null && heldCard.isPickedUp) {
+						// put down currently held up card
+						heldCard.HoldUp(false);
+						// hold up card
+						card.HoldUp(true);
+						heldCard = card;
+						SelectCard(null);
+
+					} else if (heldCard == null) {
+						// hold up card
+						card.HoldUp(true);
+						heldCard = card;
+						SelectCard(null);
+					}
+				}
+			}
+		} else if (scrollDown) {
+			if (hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard != null && heldCard.isPickedUp) {
+				// put down held card if it is already picked up
+				heldCard.HoldUp(false);
+				heldCard = null;
+			}
+		}
+
+		//if each column has 1 card
+		if (playField[0,0].card != null &&
+		    playField[0,1].card != null &&
+		    playField[0,2].card != null){
+			setupPhase = false;
+		}
+		//Debug.Log(selectedCard);
+
+	}
+
+	public void CheckInput(){
+		RaycastHit hit;
+		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+		Physics.Raycast(ray, out hit);
+		RaycastHit[] hitAll = Physics.RaycastAll(ray);
+		
+		FieldSpot overSpot = null;
+		foreach (RaycastHit h in hitAll){
+			if (h.transform.tag == "Spot"){
+				overSpot = h.transform.GetComponent<FieldSpot>();
+			}
+		}
+		
+		bool leftClick = Input.GetMouseButtonDown(0);
+		bool rightClick = Input.GetMouseButtonDown(1);
+		bool scrollUp = Input.GetAxis("Mouse ScrollWheel") > 0;
+		bool scrollDown = Input.GetAxis("Mouse ScrollWheel") < 0;
+		
+		ArrangeField();
+		if (overSpot != null){
+			if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
+				MakeGap(overSpot);
+//				gapSpot = overSpot;
+			}
+		}
+		//activePlayer.ArrangeField();
+		/*
+		if (selectedCard != null && hit.transform.tag == "Card"){ // push cards down to preview play
+			Card chosen = hit.transform.GetComponent<Card>();
+			FieldSpot spot = activePlayer.FindOnField(chosen);
+			if (spot != null){
+				Debug.Log("Here");
+				activePlayer.MakeGap(spot);
+				gapSpot = spot;
+			}
+		}
+		*/
+		
+		
+		if (leftClick && heldCard == null) {
+			if (hit.transform.tag == "Card") {
+				Card chosen = hit.transform.GetComponent<Card>();
+				if (selectedCard != null && selectedCard == chosen) {
+					SelectCard(null);
+				} else if (hand.Contains(chosen)){
+					SelectCard(chosen);
+
+				} else if (drawPile.Contains(chosen)){
+					Draw();
+				} else if ((FindOnField(chosen)) && selectedCard != null) {
+					// if player has clicked on a card in their hand and then a card in the field, insert card there
+					//Insert(chosen, activePlayer.);
+					Play(selectedCard, FindOnField(chosen));
+					SelectCard(null);
+				}
+			} else if (hit.transform.tag == "Spot") {
+				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
+				if (playField[chosen.row, chosen.col] == chosen){ //does this spot belong to the active player
+					if (selectedCard != null){
+						Play(selectedCard, chosen);
+						SelectCard(null);
+					}
+				}
+			}
+		} else if (scrollUp) {
+			if (hit.transform.tag == "Card") {
+				Card card = hit.transform.gameObject.GetComponent<Card>();
+				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
+					if (heldCard != null && heldCard.isPickedUp) {
+						// put down currently held up card
+						heldCard.HoldUp(false);
+						
+						// hold up card
+						card.HoldUp(true);
+						heldCard = card;
+						SelectCard(null);
+					} else if (heldCard == null) {
+						// hold up card
+						card.HoldUp(true);
+						heldCard = card;
+						SelectCard(null);
+					}
+				}
+			}
+		} else if (scrollDown) {
+			if (hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard != null && heldCard.isPickedUp) {
+				// put down held card if it is already picked up
+				heldCard.HoldUp(false);
+				heldCard = null;
+			}
+		}
+		
+		
+		/*
+		if (Input.GetMouseButtonDown(1)){
+			
+			if (hit.transform.tag == "Card"){
+				Card chosen = hit.transform.GetComponent<Card>();
+				foreach (FieldSpot spot in activePlayer.playField){
+					if (spot.card == chosen){
+						chosen.Flip();
+					}
+				}
+			}
+		}
+
+		if (Input.GetMouseButtonDown(2)){ //Middle mouse click, useful for debug
+			if (hit.transform.tag == "Card"){
+				Card chosen = hit.transform.GetComponent<Card>();
+				foreach (FieldSpot spot in playField){
+					if (spot.card == chosen){
+						Discard(chosen);
+					}
+				}
+			}
+		}
+		*/
+		
+		//ArrangeField();
+
+	}
+
+	void SelectCard(Card c){
+		if (selectedCard != null){ //if a card is currently selected
+			selectedCard.border.renderer.enabled = false;
+			selectedCard = null;
+		}
+		if (c != null){
+			c.border.renderer.enabled = true;
+			selectedCard = c;
+		}
 	}
 
 
-	void BeginTurn(){
-		if (NumOccupiedColumns() == 0) 
-			GameHandler.Instance.EndGame();
+	public void BeginTurn(){
+		if (NumOccupiedColumns() == 0) {
+			//GameHandler.Instance.EndGame();
+		}
 		else 
 			actionPoints = NumOccupiedColumns();
 	}
@@ -81,6 +298,7 @@ public class Player : MonoBehaviour {
 			drawPile.RemoveAt(0);
 			ArrangeHand();
 			return true;
+			actionPoints --;
 		}
 		else return false;
 
@@ -130,6 +348,7 @@ public class Player : MonoBehaviour {
 
 		ArrangeHand();
 		card.Flip();
+		actionPoints --;
 		return true;
 		
 	}
@@ -171,45 +390,26 @@ public class Player : MonoBehaviour {
 	}
 
 	void BuildDeck() {
-		if (type == PlayerType.HERA) {
-			for (int i = 0; i < 43; i++) {
-				if (i < 1)			deck[i] = CardType.HERA;
-				else if (i < 2)		deck[i] = CardType.IO;
-				else if (i < 4)		deck[i] = CardType.DIONYSUS;
-				else if (i < 5)		deck[i] = CardType.HADES;
-				else if (i < 9)		deck[i] = CardType.MEDUSA;
-				else if (i < 10)	deck[i] = CardType.PANDORA;
-				else if (i < 19)	deck[i] = CardType.PEGASUS;
-				else if (i < 20)	deck[i] = CardType.PERSEPHONE;
-				else if (i < 22)	deck[i] = CardType.PYTHIA;
-				else if (i < 23)	deck[i] = CardType.SIRENS;
-				else if (i < 28)	deck[i] = CardType.AMAZON;
-				else if (i < 29)	deck[i] = CardType.NEMESIS;
-				else if (i < 31)	deck[i] = CardType.ARTEMIS;
-				else if (i < 34)	deck[i] = CardType.HYDRA;
-				else if (i < 38)	deck[i] = CardType.HARPY;
-				else 				deck[i] = CardType.FURY;
-			}
-		} else {
-			for (int i = 0; i < 43; i++) {
-				if (i < 1)			deck[i] = CardType.ZEUS;
-				else if (i < 2)		deck[i] = CardType.ARGUS;
-				else if (i < 4)		deck[i] = CardType.DIONYSUS;
-				else if (i < 5)		deck[i] = CardType.HADES;
-				else if (i < 9)		deck[i] = CardType.MEDUSA;
-				else if (i < 10)	deck[i] = CardType.PANDORA;
-				else if (i < 19)	deck[i] = CardType.PEGASUS;
-				else if (i < 20)	deck[i] = CardType.PERSEPHONE;
-				else if (i < 22)	deck[i] = CardType.PYTHIA;
-				else if (i < 23)	deck[i] = CardType.SIRENS;
-				else if (i < 28)	deck[i] = CardType.HERO;
-				else if (i < 29)	deck[i] = CardType.POSEIDON;
-				else if (i < 31)	deck[i] = CardType.APOLLO;
-				else if (i < 34)	deck[i] = CardType.GIANT;
-				else if (i < 38)	deck[i] = CardType.CYCLOPS;
-				else 				deck[i] = CardType.CENTAUR;
-			}
+
+		for (int i = 0; i < 43; i++) {
+			if (i < 1)			deck[i] = CardType.ZEUS;
+			else if (i < 2)		deck[i] = CardType.ARGUS;
+			else if (i < 4)		deck[i] = CardType.DIONYSUS;
+			else if (i < 5)		deck[i] = CardType.HADES;
+			else if (i < 9)		deck[i] = CardType.MEDUSA;
+			else if (i < 10)	deck[i] = CardType.PANDORA;
+			else if (i < 19)	deck[i] = CardType.PEGASUS;
+			else if (i < 20)	deck[i] = CardType.PERSEPHONE;
+			else if (i < 22)	deck[i] = CardType.PYTHIA;
+			else if (i < 23)	deck[i] = CardType.SIRENS;
+			else if (i < 28)	deck[i] = CardType.HERO;
+			else if (i < 29)	deck[i] = CardType.POSEIDON;
+			else if (i < 31)	deck[i] = CardType.APOLLO;
+			else if (i < 34)	deck[i] = CardType.GIANT;
+			else if (i < 38)	deck[i] = CardType.CYCLOPS;
+			else 				deck[i] = CardType.CENTAUR;
 		}
+
 	}
 
 	void BuildPlayField(){
@@ -244,7 +444,7 @@ public class Player : MonoBehaviour {
 	int NumOccupiedColumns(){
 		int num = 0;
 		for (int col = 0; col < 3; col ++){
-			if (playField[0,col].card ==  null)
+			if (playField[0,col].card !=  null)
 				num++;
 		}
 		

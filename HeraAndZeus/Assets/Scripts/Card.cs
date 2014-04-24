@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 
 public enum CardType {
-	HERA, IO, AMAZON, NEMESIS, ARTEMIS, HYDRA, HARPY, FURY,		// HERA cards
+	//HERA, IO, AMAZON, NEMESIS, ARTEMIS, HYDRA, HARPY, FURY,		// HERA cards
 	ZEUS, ARGUS, HERO, POSEIDON, APOLLO, GIANT, CYCLOPS, CENTAUR,	// ZEUS cards
 	DIONYSUS, HADES, MEDUSA, PANDORA, PEGASUS, PERSEPHONE, PYTHIA, SIRENS,	// common cards
 	NONE
@@ -39,8 +39,11 @@ public class Card : MonoBehaviour {
 	public TextMesh strengthText;
 	public TextMesh specialText;
 
+	public GameObject border;
+
 	// Use this for initialization
 	void Start () {
+		border.renderer.enabled = false;
 		//type = CardType.NONE;
 		name = type.ToString();
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
@@ -147,6 +150,7 @@ public class Card : MonoBehaviour {
 		this.name = type.ToString();
 		this.title = type.ToString();
 		switch(type) {
+			/*
 			case CardType.HERA:
 				this.strength = -1;
 				this.special = true;
@@ -179,6 +183,7 @@ public class Card : MonoBehaviour {
 				this.strength = 3;
 				this.special = false;
 				break;
+				*/
 			case CardType.ZEUS:
 				this.strength = -1;
 				this.special = true;
