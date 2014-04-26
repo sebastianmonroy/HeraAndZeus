@@ -302,7 +302,11 @@ public class Player : MonoBehaviour {
 			//GameHandler.Instance.EndGame();
 		}
 		else 
-			actionPoints = NumOccupiedColumns();
+			if (FindOnField(CardType.ZEUS) != null) {
+				actionPoints = 4;
+			} else {
+				actionPoints = NumOccupiedColumns();
+			}
 	}
 
 
