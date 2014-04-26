@@ -219,22 +219,22 @@ public class Player : MonoBehaviour {
 						// clicked on enemy card
 						if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
 							// clicked on enemy card in same column as selected card
-							context = 0;
+							context = 0;	// field to field
 						} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
 							// clicked own card in hand and then enemy card in hand
-							context = 1;
+							context = 1;	// hand to hand
 						} else if (hand.Contains(selectedCard) && chosen.spot != null && chosen.spot.row == 0) {
 							// clicked own card in hand and then enemy card in front row of field
-							context = 2;
+							context = 2;	// hand to field
 						}
 						int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
-						SelectCard(null);
-						
+
 						if (resolution != 0) {
 							chosen.Reveal(true);
 							selectedCard.Reveal(true);
 							actionPoints --;
 						}
+						SelectCard(null);
 					}
 				}
 			} else if (hit.transform.tag == "Spot") {
@@ -369,8 +369,14 @@ public class Player : MonoBehaviour {
 			hand.Remove(card);
 
 			ArrangeHand();
-			card.Flip();
+			card.Flip(false);
 			actionPoints --;
+
+			this.updateAllCardPredictions(CardType.DIONYSUS, -2);
+			this.updateAllCardPredictions(CardType.HADES, -1);
+			this.updateAllCardPredictions(CardType.PERSEPHONE, -1);
+			this.updateAllCardPredictions(CardType.SIRENS, -1);
+			this.updateAllCardPredictions(CardType.ZEUS, -1);
 			return true;
 		} else {
 			return false;
