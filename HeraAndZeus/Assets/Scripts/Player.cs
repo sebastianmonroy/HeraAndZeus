@@ -215,20 +215,34 @@ public class Player : MonoBehaviour {
 					// player has selected card and chosen card
 					if (chosen.owner != this) {
 						//Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
-
+						int context = 3;
 						// clicked on enemy card
 						if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
 							// clicked on enemy card in same column as selected card
 //							Debug.Log("Context: " + 0 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
-							ResolveChallenge.resolve(0, selectedCard.type, chosen.type);
+							context = 0;
 						} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
 							// clicked own card in hand and then enemy card in hand
 //							Debug.Log("Context: " + 1 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
-							ResolveChallenge.resolve(1, selectedCard.type, chosen.type);
+							context = 1;
 						} else if (hand.Contains(selectedCard) && chosen.spot != null && chosen.spot.row == 0) {
 							// clicked own card in hand and then enemy card in front row of field
 //							Debug.Log("Context: " + 2 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
-							ResolveChallenge.resolve(2, selectedCard.type, chosen.type);
+							context = 2;
+						}
+
+						switch(ResolveChallenge.resolve(context, selectedCard.type, chosen.type)) {
+							case 0:
+								Debug.Log("Invalid Challenge");
+								break;
+							case 1:
+
+								break;
+							case 2:
+
+								break;
+							default:
+								break;
 						}
 					}
 				}
