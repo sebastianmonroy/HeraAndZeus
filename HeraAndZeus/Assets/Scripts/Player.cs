@@ -181,8 +181,11 @@ public class Player : MonoBehaviour {
 		ArrangeField();
 		if (overSpot != null){
 			if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
-				if (FindOnField(selectedCard) == null)
-				MakeGap(overSpot);
+				if (FindOnField(selectedCard) == null) {
+					if (selectedCard == null || (selectedCard.type != CardType.ZEUS && selectedCard.strength != -1) || (selectedCard.type == CardType.ZEUS && overSpot.row == 0)) {
+						MakeGap(overSpot);
+					}
+				}
 //				gapSpot = overSpot;
 			}
 		}
@@ -349,10 +352,6 @@ public class Player : MonoBehaviour {
 					return false; //play unsuccessful
 				}		
 				else{//move every card in the target row or higher down a row to make room
-					FieldSpot zeusSpot = FindOnField(CardType.ZEUS);
-					if (zeusSpot != null && zeusSpot.col == spot.col && zeusSpot.row >= spot.row) { // zeus is in same column and in the same or a greater row than the spot you are trying to place it in
-						return false;
-					}
 					for (int row = 2; row >= spot.row; row--){
 						if (playField[row,spot.col].card != null){
 							playField[row+1,spot.col].card = playField[row,spot.col].card;
@@ -364,6 +363,10 @@ public class Player : MonoBehaviour {
 			}
 			else{ // this spot is unoccupied
 				spot = NextAvailableSpot(spot.col); //ge the next available spot in this column
+				// ZEUS can not be played in empty column
+				if (card.type == CardType.ZEUS && spot.row == 0) {
+					return false;
+				}
 			}
 
 			// ZEUS can only be played in front row
