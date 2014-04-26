@@ -219,17 +219,16 @@ public class Player : MonoBehaviour {
 						// clicked on enemy card
 						if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
 							// clicked on enemy card in same column as selected card
-//							Debug.Log("Context: " + 0 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
 							context = 0;
 						} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
 							// clicked own card in hand and then enemy card in hand
-//							Debug.Log("Context: " + 1 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
 							context = 1;
 						} else if (hand.Contains(selectedCard) && chosen.spot != null && chosen.spot.row == 0) {
 							// clicked own card in hand and then enemy card in front row of field
-//							Debug.Log("Context: " + 2 + " selectedCard.type: " + (int)selectedCard.type + " chosen.type: " + (int)chosen.type);
 							context = 2;
 						}
+						int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
+						SelectCard(null);
 
 						int resolution = ResolveChallenge.resolve(context, selectedCard.type, chosen.type);
 						SelectCard(null);
@@ -320,14 +319,24 @@ public class Player : MonoBehaviour {
 	}
 
 	public bool Discard(Card card){
+		Debug.Log("Discarding: " + card.type);
 		FieldSpot spot = FindOnField(card);
 		if (spot != null){
+//			Debug.Log (this.name + " discards from field " + card.type);
 			discardPile.Add(card);
 			card.Reveal(true);
 			card.MoveTo(discardPilePos);
 			card.inField = false;
 			spot.card = null;
 			ArrangeField();
+			return true;
+		}
+		else if (hand.Contains(card)){
+			discardPile.Add(card);
+			card.Flip(false);
+			card.MoveTo(discardPilePos);
+			hand.Remove(card);
+			ArrangeHand();
 			return true;
 		}
 
