@@ -323,7 +323,6 @@ public class Player : MonoBehaviour {
 			discardPile.Add(card);
 			card.Reveal(true);
 			card.MoveTo(discardPilePos);
-			card.inField = false;
 			spot.card = null;
 			ArrangeField();
 			return true;
@@ -345,7 +344,7 @@ public class Player : MonoBehaviour {
 		if (card.strength > -1) {
 			if (spot.card != null){//there is already a card in the target spot
 
-				if (NextAvailableSpot(spot.col) == null){ //the column is full or card is not playable in the field
+				if (NextAvailableSpot(spot.col) == null){ //the column is full
 
 					return false; //play unsuccessful
 				}		
@@ -361,6 +360,11 @@ public class Player : MonoBehaviour {
 			}
 			else{ // this spot is unoccupied
 				spot = NextAvailableSpot(spot.col); //ge the next available spot in this column
+			}
+
+			// ZEUS can only be played in front row
+			if (card.type == CardType.ZEUS && spot.row != 0) {
+				return false;
 			}
 
 			spot.card = card;
