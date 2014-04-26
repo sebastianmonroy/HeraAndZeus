@@ -32,6 +32,8 @@ public class Card : MonoBehaviour {
 	public bool typeSet = false;
 	Vector3 goalRotation;
 	Vector3 destination;
+	public bool showText = false;
+
 	public bool revealed = false;
 
 	// prediction array is as long as number of card types	
@@ -130,7 +132,7 @@ public class Card : MonoBehaviour {
 				predictVector[(int) ctype]++;
 			}
 		}
-		Debug.Log(predictVector.Length);
+		//Debug.Log(predictVector.Length);
 		predictVector[(int) ct] += amount;
 
 		if (predictVector[(int) ct] < 0) {
@@ -169,19 +171,28 @@ public class Card : MonoBehaviour {
 	}
 
 	private void DetermineTextVisibility() {
-		bool revealed = false;
-		if (this.transform.eulerAngles.z > 90 && this.transform.eulerAngles.z < 270) {
-			revealed = true;
-		}
+		bool showText = (this.transform.eulerAngles.z > 90 && this.transform.eulerAngles.z < 270);
 
-		titleText.active = revealed;
-		strengthText.active = revealed;
-		specialText.active = revealed;
+		titleText.active = showText;
+		strengthText.active = showText;
+		specialText.active = showText;
 	}
 
 	public void MoveTo(Vector3 dest){
 		moving = true;
 		destination = dest;
+	}
+
+	public void Reveal(bool revBool) {
+		if (revBool && !revealed) {
+			Flip(true);
+			revealed = true;
+			this.owner.updateAllCardPredictions(type, -1);
+		} else if (!revBool && revealed) {
+			Flip(false);
+			revealed = false;
+			this.owner.updateAllCardPredictions(type, 1);
+		}
 	}
 
 	public void HoldUp(bool pickBool) {

@@ -89,7 +89,7 @@ public class Player : MonoBehaviour {
 	public void SetupField(){
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-		Physics.Raycast(ray, out hit);
+		bool raycast = Physics.Raycast(ray, out hit);
 		RaycastHit[] hitAll = Physics.RaycastAll(ray);
 
 		//Debug.Log(hit.collider.gameObject.name);
@@ -123,7 +123,7 @@ public class Player : MonoBehaviour {
 				}
 			}
 		} else if (scrollUp) {
-			if (hit.transform.tag == "Card") {
+			if (raycast && hit.transform.tag == "Card") {
 				Card card = hit.transform.gameObject.GetComponent<Card>();
 				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
 					if (heldCard != null && heldCard.isPickedUp) {
@@ -143,7 +143,7 @@ public class Player : MonoBehaviour {
 				}
 			}
 		} else if (scrollDown) {
-			if (hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard != null && heldCard.isPickedUp) {
+			if (raycast && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard != null && heldCard.isPickedUp) {
 				// put down held card if it is already picked up
 				heldCard.HoldUp(false);
 				heldCard = null;
@@ -163,7 +163,7 @@ public class Player : MonoBehaviour {
 	public void CheckInput(){
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-		Physics.Raycast(ray, out hit);
+		bool raycast = Physics.Raycast(ray, out hit);
 		RaycastHit[] hitAll = Physics.RaycastAll(ray);
 		
 		FieldSpot overSpot = null;
@@ -215,7 +215,7 @@ public class Player : MonoBehaviour {
 					// player has selected card and chosen card
 					if (chosen.owner != this) {
 						//Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
-						int context = 3;
+						int context = 0;
 						// clicked on enemy card
 						if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
 							// clicked on enemy card in same column as selected card
@@ -236,12 +236,16 @@ public class Player : MonoBehaviour {
 								Debug.Log("Invalid Challenge");
 								break;
 							case 1:
-
+								chosen.Reveal(true);
+								selectedCard.Reveal(true);
 								break;
 							case 2:
-
+								chosen.Reveal(true);
+								selectedCard.Reveal(true);
 								break;
-							default:
+							case 3:
+								chosen.Reveal(true);
+								selectedCard.Reveal(true);
 								break;
 						}
 					}
@@ -256,7 +260,7 @@ public class Player : MonoBehaviour {
 				}
 			}
 		} else if (scrollUp) {
-			if (hit.transform.tag == "Card") {
+			if (raycast && hit.transform.tag == "Card") {
 				Card card = hit.transform.gameObject.GetComponent<Card>();
 				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
 					if (heldCard != null && heldCard.isPickedUp) {
@@ -278,7 +282,7 @@ public class Player : MonoBehaviour {
 				}
 			}
 		} else if (scrollDown) {
-			if (heldCard != null && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard.isPickedUp) {
+			if (raycast && heldCard != null && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard.isPickedUp) {
 				// put down held card if it is already picked up
 				heldCard.HoldUp(false);
 				heldCard = null;
@@ -328,7 +332,7 @@ public class Player : MonoBehaviour {
 		FieldSpot spot = FindOnField(card);
 		if (spot != null){
 			discardPile.Add(card);
-			card.Flip(false);
+			card.SetFlip(true);
 			card.MoveTo(discardPilePos);
 			card.inField = false;
 			spot.card = null;
