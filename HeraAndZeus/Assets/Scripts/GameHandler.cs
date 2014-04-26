@@ -21,16 +21,16 @@ public class GameHandler : MonoBehaviour {
 	 */
 	static int[,,] challengeTable = new int[,,] {{ 
 			//Field to Field
-			//                            |P|    
-			//                            |E|    
-			//        |P|       |D|       |R|    
-			//        |O|   |C|C|I|   |P|P|S|
-			//        |S|A| |Y|E|O| |M|A|E|E|P|S|
-			//    |A| |E|P|G|C|N|N|H|E|N|G|P|Y|I|
-			//  |Z|R|H|I|O|I|L|T|Y|A|D|D|A|H|T|R|
-			//  |E|G|E|D|L|A|O|A|S|D|U|O|S|O|H|E|
-			//  |U|U|R|O|L|N|P|U|U|E|S|R|U|N|I|N|
-			//  |S|S|O|N|O|T|S|R|S|S|A|A|S|E|A|S|
+		//                            |P|    
+		//                            |E|    
+		//        |P|       |D|       |R|    
+		//        |O|   |C|C|I|   |P|P|S|
+		//        |S|A| |Y|E|O| |M|A|E|E|P|S|
+		//    |A| |E|P|G|C|N|N|H|E|N|G|P|Y|I|
+		//  |Z|R|H|I|O|I|L|T|Y|A|D|D|A|H|T|R|
+		//  |E|G|E|D|L|A|O|A|S|D|U|O|S|O|H|E|
+		//  |U|U|R|O|L|N|P|U|U|E|S|R|U|N|I|N|
+		//  |S|S|O|N|O|T|S|R|S|S|A|A|S|E|A|S|
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //ZEUS
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //ARGUS
 			{0,1,3,2,2,2,2,2,0,0,1,3,1,0,1,0}, //HERO
@@ -48,7 +48,7 @@ public class GameHandler : MonoBehaviour {
 			{0,3,2,2,2,2,2,2,0,0,2,3,2,0,3,0}, //PYTHIA
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},//SIRENS
 		
-		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Hand
+		   {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Hand
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -65,7 +65,7 @@ public class GameHandler : MonoBehaviour {
 			{0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},
 		
-		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Field
+		   {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Field
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
