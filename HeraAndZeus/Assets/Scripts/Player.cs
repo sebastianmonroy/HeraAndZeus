@@ -231,22 +231,13 @@ public class Player : MonoBehaviour {
 							context = 2;
 						}
 
-						switch(ResolveChallenge.resolve(context, selectedCard.type, chosen.type)) {
-							case 0:
-								Debug.Log("Invalid Challenge");
-								break;
-							case 1:
-								chosen.Reveal(true);
-								selectedCard.Reveal(true);
-								break;
-							case 2:
-								chosen.Reveal(true);
-								selectedCard.Reveal(true);
-								break;
-							case 3:
-								chosen.Reveal(true);
-								selectedCard.Reveal(true);
-								break;
+						int resolution = ResolveChallenge.resolve(context, selectedCard.type, chosen.type);
+						SelectCard(null);
+						
+						if (resolution != 0) {
+							chosen.Reveal(true);
+							selectedCard.Reveal(true);
+							actionPoints --;
 						}
 					}
 				}
@@ -332,7 +323,7 @@ public class Player : MonoBehaviour {
 		FieldSpot spot = FindOnField(card);
 		if (spot != null){
 			discardPile.Add(card);
-			card.SetFlip(true);
+			card.Reveal(true);
 			card.MoveTo(discardPilePos);
 			card.inField = false;
 			spot.card = null;
