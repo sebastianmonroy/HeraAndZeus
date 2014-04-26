@@ -201,7 +201,7 @@ public class Player : MonoBehaviour {
 		
 		
 		if (leftClick && heldCard == null) {
-			if (hit.transform.tag == "Card") {
+			if (raycast && hit.transform.tag == "Card") {
 				Card chosen = hit.transform.GetComponent<Card>();
 				if (selectedCard != null && selectedCard == chosen) {
 					SelectCard(null);
@@ -349,6 +349,10 @@ public class Player : MonoBehaviour {
 					return false; //play unsuccessful
 				}		
 				else{//move every card in the target row or higher down a row to make room
+					FieldSpot zeusSpot = FindOnField(CardType.ZEUS);
+					if (zeusSpot != null && zeusSpot.col == spot.col && zeusSpot.row >= spot.row) { // zeus is in same column and in the same or a greater row than the spot you are trying to place it in
+						return false;
+					}
 					for (int row = 2; row >= spot.row; row--){
 						if (playField[row,spot.col].card != null){
 							playField[row+1,spot.col].card = playField[row,spot.col].card;
@@ -529,6 +533,15 @@ public class Player : MonoBehaviour {
 	public FieldSpot FindOnField(Card card){
 		foreach (FieldSpot spot in playField){
 			if (spot.card == card){
+				return spot;
+			}
+		}
+		return null;
+	}
+
+	public FieldSpot FindOnField(CardType ct){
+		foreach (FieldSpot spot in playField){
+			if (spot.card != null && spot.card.type == ct){
 				return spot;
 			}
 		}
