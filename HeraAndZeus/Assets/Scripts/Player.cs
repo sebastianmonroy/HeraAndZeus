@@ -63,9 +63,6 @@ public class Player : MonoBehaviour {
 								- transform.forward * (Card.height + buffer);
 
 		allCards = BuildDrawPile();
-		foreach (Card c in allCards) {
-			updateAllCardPredictions(c.type, 1);
-		}
 
 		Shuffle(drawPile);
 
@@ -389,14 +386,20 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	private Card[] BuildDrawPile(){
+	private Card[] BuildDrawPile() {
+		List<CardType> allCardsList = new List<CardType>();
+		allCardsList.AddRange(deck);
+
 		foreach (CardType type in deck){
 			Card c = GameObject.Instantiate(cardPrefab, drawPilePos, Quaternion.identity) as Card;
 			c.SetType(type);
 			c.SetFlip(false);
 			c.owner = this;
+			c.predictList = allCardsList;
+			c.setupPredictionVector();
 			drawPile.Add(c);
 		}
+
 		return drawPile.ToArray();
 	}
 
@@ -528,7 +531,7 @@ public class Player : MonoBehaviour {
 
 	public void updateAllCardPredictions(CardType ct, int amount) {
 		foreach (Card card in allCards) {
-			card.updatePrediction(ct, amount);
+			card.updatePredictionList(ct, amount);
 		}
 	}
 

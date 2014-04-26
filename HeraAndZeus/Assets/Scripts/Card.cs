@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum CardType {
 	//HERA, IO, AMAZON, NEMESIS, ARTEMIS, HYDRA, HARPY, FURY,		// HERA cards
@@ -34,8 +35,8 @@ public class Card : MonoBehaviour {
 	public bool revealed = false;
 
 	// prediction array is as long as number of card types	
-	public int[] prediction = new int[Enum.GetNames(typeof(CardType)).Length-1];
-
+	public int[] predictVector = new int[Enum.GetNames(typeof(CardType)).Length-1];
+	public List<CardType> predictList = new List<CardType>();
 	public FieldSpot spot;
 
 	public TextMesh titleText;
@@ -48,7 +49,7 @@ public class Card : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		// initialize and fill predictions vector
+		// initialize and fill predictVector
 		 
 
 		border.renderer.enabled = false;
@@ -118,23 +119,51 @@ public class Card : MonoBehaviour {
 		DetermineTextVisibility();
 	}
 
-	public void updatePrediction(CardType ct, int amount) {
-		if (prediction.Length == 0) {
-			prediction = new int[Enum.GetNames(typeof(CardType)).Length-1];
+	public void setupPredictionVector() {
+		updatePredictionVector(CardType.ZEUS, 0);
+	}
+
+	public void updatePredictionVector(CardType ct, int amount) {
+		if (predictVector == null || predictVector.Length == 0) {
+			predictVector = new int[Enum.GetNames(typeof(CardType)).Length-1];
+			foreach (CardType ctype in predictList) {
+				predictVector[(int) ctype]++;
+			}
 		}
-		Debug.Log(prediction.Length);
-		prediction[(int) ct] += amount;
+		Debug.Log(predictVector.Length);
+		predictVector[(int) ct] += amount;
+
+		if (predictVector[(int) ct] < 0) {
+			predictVector[(int) ct] = 0;
+		}
+	}
+
+	public void updatePredictionList(Card card, int amount) {
+		updatePredictionList(card.type, amount);
+	}
+
+	public void updatePredictionList(CardType ct, int amount) {
+		if (amount > 0) {
+			for (int i = 0; i < amount; i++) {
+				predictList.Add(ct);
+			}
+		} else if (amount < 0) {
+			for (int i = 0; i > amount; i--) {
+				predictList.Remove(ct);
+			}
+		}
+		updatePredictionVector(ct, amount);
 	}
 
 	public float[] getPredictionProbabilities() {
-		float[] probabilities = new float[prediction.Length];
+		float[] probabilities = new float[predictVector.Length];
 		int sum = 0;
-		foreach (int i in prediction) {
+		foreach (int i in predictVector) {
 			sum += i;
 		}
 
-		for (int i = 0; i < prediction.Length; i++) {
-			probabilities[i] = (float) (prediction[i]) / sum;
+		for (int i = 0; i < predictVector.Length; i++) {
+			probabilities[i] = (float) (predictVector[i]) / sum;
 		}
 		return probabilities;
 	}
