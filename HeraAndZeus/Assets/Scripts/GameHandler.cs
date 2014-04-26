@@ -149,7 +149,7 @@ public class GameHandler : MonoBehaviour {
 		//SPECIAL CASES
 		if (defender.type == CardType.PANDORA){
 			foreach (FieldSpot spot in inactivePlayer.playField){
-				if (spot.col = defender)
+
 			}
 		}
 
