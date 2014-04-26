@@ -316,7 +316,7 @@ public class Player : MonoBehaviour {
 	
 	
 	public bool Play(Card card, FieldSpot spot){
-		if (card.fieldable) {
+		if (card.strength > -1) {
 			if (spot.card != null){//there is already a card in the target spot
 
 				if (NextAvailableSpot(spot.col) == null){ //the column is full or card is not playable in the field
@@ -365,7 +365,6 @@ public class Player : MonoBehaviour {
 	}
 
 	void Shuffle(List<Card> cards){
-
 		int n = cards.Count;
 		while (n > 1) {
 			int k = (Random.Range(0, n) % n);
@@ -389,30 +388,27 @@ public class Player : MonoBehaviour {
 	}
 
 	void BuildDeck() {
-
 		for (int i = 0; i < 43; i++) {
-			if (i < 1)			deck[i] = CardType.ZEUS;
-			else if (i < 2)		deck[i] = CardType.ARGUS;
-			else if (i < 4)		deck[i] = CardType.DIONYSUS;
-			else if (i < 5)		deck[i] = CardType.HADES;
-			else if (i < 9)		deck[i] = CardType.MEDUSA;
-			else if (i < 10)	deck[i] = CardType.PANDORA;
-			else if (i < 19)	deck[i] = CardType.PEGASUS;
-			else if (i < 20)	deck[i] = CardType.PERSEPHONE;
-			else if (i < 22)	deck[i] = CardType.PYTHIA;
-			else if (i < 23)	deck[i] = CardType.SIRENS;
-			else if (i < 28)	deck[i] = CardType.HERO;
-			else if (i < 29)	deck[i] = CardType.POSEIDON;
-			else if (i < 31)	deck[i] = CardType.APOLLO;
-			else if (i < 34)	deck[i] = CardType.GIANT;
-			else if (i < 38)	deck[i] = CardType.CYCLOPS;
-			else 				deck[i] = CardType.CENTAUR;
+			if (i < 1)			deck[i] = CardType.ZEUS;		// 1
+			else if (i < 2)		deck[i] = CardType.ARGUS;		// 1
+			else if (i < 4)		deck[i] = CardType.DIONYSUS;	// 2
+			else if (i < 5)		deck[i] = CardType.HADES;		// 1
+			else if (i < 9)		deck[i] = CardType.MEDUSA;		// 4
+			else if (i < 10)	deck[i] = CardType.PANDORA;		// 1
+			else if (i < 19)	deck[i] = CardType.PEGASUS;		// 9
+			else if (i < 20)	deck[i] = CardType.PERSEPHONE;	// 1
+			else if (i < 22)	deck[i] = CardType.PYTHIA;		// 2
+			else if (i < 23)	deck[i] = CardType.SIRENS;		// 1
+			else if (i < 28)	deck[i] = CardType.HERO;		// 5
+			else if (i < 29)	deck[i] = CardType.POSEIDON;	// 1
+			else if (i < 31)	deck[i] = CardType.APOLLO;		// 2
+			else if (i < 34)	deck[i] = CardType.GIANT;		// 3
+			else if (i < 38)	deck[i] = CardType.CYCLOPS;		// 4
+			else 				deck[i] = CardType.CENTAUR;		// 5
 		}
-
 	}
 
 	void BuildPlayField(){
-
 		for (int row = 0; row < 4; row++){
 			for (int col = 0; col < 3; col++){
 

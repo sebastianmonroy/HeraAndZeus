@@ -33,7 +33,7 @@ public class Card : MonoBehaviour {
 	Vector3 destination;
 	public bool revealed = false;
 
-	public bool fieldable = true;
+	public int[] prediction;
 
 	public FieldSpot spot;
 
@@ -52,6 +52,25 @@ public class Card : MonoBehaviour {
 		name = type.ToString();
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
 		originalScale = this.transform.localScale;
+		
+		// initialize and fill predictions vector
+		prediction = new int[Enum.GetNames(typeof(CardType)).Length]; // prediction array is as long as number of card types
+		updatePrediction(CardType.ZEUS, 1);
+		updatePrediction(CardType.ARGUS, 1);
+		updatePrediction(CardType.DIONYSUS, 2);
+		updatePrediction(CardType.HADES, 1);
+		updatePrediction(CardType.MEDUSA, 4);
+		updatePrediction(CardType.PANDORA, 1);
+		updatePrediction(CardType.PEGASUS, 9);
+		updatePrediction(CardType.PERSEPHONE, 1);
+		updatePrediction(CardType.PYTHIA, 2);
+		updatePrediction(CardType.SIRENS, 1);
+		updatePrediction(CardType.HERO, 5);
+		updatePrediction(CardType.POSEIDON, 1);
+		updatePrediction(CardType.APOLLO, 2);
+		updatePrediction(CardType.GIANT, 3);
+		updatePrediction(CardType.CYCLOPS, 4);
+		updatePrediction(CardType.CENTAUR, 5);
 	}
 	
 	// Update is called once per frame
@@ -95,6 +114,23 @@ public class Card : MonoBehaviour {
 		}
 
 		DetermineTextVisibility();
+	}
+
+	public void updatePrediction(CardType ct, int amount) {
+		prediction[(int) ct] += amount;
+	}
+
+	public float[] getPredictionProbabilities() {
+		float[] probabilities = new float[prediction.Length];
+		int sum = 0;
+		foreach (int i in prediction) {
+			sum += i;
+		}
+
+		for (int i = 0; i < prediction.Length; i++) {
+			probabilities[i] = (float) (prediction[i]) / sum;
+		}
+		return probabilities;
 	}
 
 	private void DetermineTextVisibility() {
@@ -189,84 +225,68 @@ public class Card : MonoBehaviour {
 				break;
 				*/
 			case CardType.ZEUS:
-				this.strength = -1;
+				this.strength = 8;
 				this.special = true;
-				this.fieldable = false;
 				break;
 			case CardType.ARGUS:
 				this.strength = 0;
 				this.special = true;
-				this.fieldable = true;
 				break;
 			case CardType.HERO:
 				this.strength = 2;
 				this.special = true;
-				this.fieldable = true;
 				break;
 			case CardType.POSEIDON:
 				this.strength = 7;
 				this.special = false;
-				this.fieldable = true;
 				break;
 			case CardType.APOLLO:
 				this.strength = 6;
 				this.special = false;
-				this.fieldable = true;
 				break;
 			case CardType.GIANT:
 				this.strength = 5;
 				this.special = false;
-				this.fieldable = true;
 				break;
 			case CardType.CYCLOPS:
 				this.strength = 4;
 				this.special = false;
-				this.fieldable = true;
 				break;
 			case CardType.CENTAUR:
 				this.strength = 3;
 				this.special = false;
-				this.fieldable = true;
 				break;
 			case CardType.DIONYSUS:
 				this.strength = -1;
 				this.special = true;
-				this.fieldable = true;
 				break;
 			case CardType.HADES:
 				this.strength = -1;
 				this.special = true;
-				this.fieldable = false;
 				break;
 			case CardType.MEDUSA:
 				this.strength = 0;
 				this.special = true;
-				this.fieldable = true;
 				break;
 			case CardType.PANDORA:
 				this.strength = 0;
 				this.special = true;
-				this.fieldable = true;
 				break;
 			case CardType.PEGASUS:
 				this.strength = 1;
 				this.special = true;
-				this.fieldable = true;
 				break;
 			case CardType.PERSEPHONE:
 				this.strength = -1;
 				this.special = true;
-				this.fieldable = false;
 				break;
 			case CardType.PYTHIA:
 				this.strength = 0;
 				this.special = true;
-				this.fieldable = true;
 				break;
 			case CardType.SIRENS:
 				this.strength = -1;
 				this.special = true;
-				this.fieldable = false;
 				break;
 			default:
 				this.title = "ERROR";
