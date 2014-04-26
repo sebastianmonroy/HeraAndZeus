@@ -203,7 +203,7 @@ public class Player : MonoBehaviour {
 				} else if (chosen != null && selectedCard != null) {
 					// player has selected card and chosen card
 					if (chosen.owner != this) {
-						Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
+						//Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
 
 						// clicked on enemy card
 						if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
@@ -316,37 +316,39 @@ public class Player : MonoBehaviour {
 	
 	
 	public bool Play(Card card, FieldSpot spot){
+		if (card.fieldable) {
+			if (spot.card != null){//there is already a card in the target spot
 
-		if (spot.card != null){//there is already a card in the target spot
+				if (NextAvailableSpot(spot.col) == null){ //the column is full or card is not playable in the field
 
-			if (NextAvailableSpot(spot.col) == null){ //the column is full
-
-				return false; //play unsuccessful
-			}		
-			else{//move every card in the target row or higher down a row to make room
-				for (int row = 2; row >= spot.row; row--){
-					if (playField[row,spot.col].card != null){
-						playField[row+1,spot.col].card = playField[row,spot.col].card;
-						playField[row,spot.col].card = null;
-						playField[row+1,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2);
+					return false; //play unsuccessful
+				}		
+				else{//move every card in the target row or higher down a row to make room
+					for (int row = 2; row >= spot.row; row--){
+						if (playField[row,spot.col].card != null){
+							playField[row+1,spot.col].card = playField[row,spot.col].card;
+							playField[row,spot.col].card = null;
+							playField[row+1,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2);
+						}
 					}
 				}
 			}
-		}
-		else{ // this spot is unoccupied
-			spot = NextAvailableSpot(spot.col); //ge the next available spot in this column
-		}
+			else{ // this spot is unoccupied
+				spot = NextAvailableSpot(spot.col); //ge the next available spot in this column
+			}
 
-		spot.card = card;
-		card.spot = spot;
-		card.MoveTo(spot.transform.position + Vector3.up * 2);
-		hand.Remove(card);
+			spot.card = card;
+			card.spot = spot;
+			card.MoveTo(spot.transform.position + Vector3.up * 2);
+			hand.Remove(card);
 
-		ArrangeHand();
-		card.Flip();
-		actionPoints --;
-		return true;
-		
+			ArrangeHand();
+			card.Flip();
+			actionPoints --;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public bool Move(Card card, FieldSpot newSpot) {

@@ -33,6 +33,8 @@ public class Card : MonoBehaviour {
 	Vector3 destination;
 	public bool revealed = false;
 
+	public bool fieldable = true;
+
 	public FieldSpot spot;
 
 	public TextMesh titleText;
@@ -189,66 +191,82 @@ public class Card : MonoBehaviour {
 			case CardType.ZEUS:
 				this.strength = -1;
 				this.special = true;
+				this.fieldable = false;
 				break;
 			case CardType.ARGUS:
 				this.strength = 0;
 				this.special = true;
+				this.fieldable = true;
 				break;
 			case CardType.HERO:
 				this.strength = 2;
 				this.special = true;
+				this.fieldable = true;
 				break;
 			case CardType.POSEIDON:
 				this.strength = 7;
 				this.special = false;
+				this.fieldable = true;
 				break;
 			case CardType.APOLLO:
 				this.strength = 6;
 				this.special = false;
+				this.fieldable = true;
 				break;
 			case CardType.GIANT:
 				this.strength = 5;
 				this.special = false;
+				this.fieldable = true;
 				break;
 			case CardType.CYCLOPS:
 				this.strength = 4;
 				this.special = false;
+				this.fieldable = true;
 				break;
 			case CardType.CENTAUR:
 				this.strength = 3;
 				this.special = false;
+				this.fieldable = true;
 				break;
 			case CardType.DIONYSUS:
 				this.strength = -1;
 				this.special = true;
+				this.fieldable = true;
 				break;
 			case CardType.HADES:
 				this.strength = -1;
 				this.special = true;
+				this.fieldable = false;
 				break;
 			case CardType.MEDUSA:
 				this.strength = 0;
 				this.special = true;
+				this.fieldable = true;
 				break;
 			case CardType.PANDORA:
 				this.strength = 0;
 				this.special = true;
+				this.fieldable = true;
 				break;
 			case CardType.PEGASUS:
 				this.strength = 1;
 				this.special = true;
+				this.fieldable = true;
 				break;
 			case CardType.PERSEPHONE:
 				this.strength = -1;
 				this.special = true;
+				this.fieldable = false;
 				break;
 			case CardType.PYTHIA:
 				this.strength = 0;
 				this.special = true;
+				this.fieldable = true;
 				break;
 			case CardType.SIRENS:
 				this.strength = -1;
 				this.special = true;
+				this.fieldable = false;
 				break;
 			default:
 				this.title = "ERROR";
