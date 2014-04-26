@@ -229,9 +229,6 @@ public class Player : MonoBehaviour {
 						}
 						int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
 						SelectCard(null);
-
-						int resolution = ResolveChallenge.resolve(context, selectedCard.type, chosen.type);
-						SelectCard(null);
 						
 						if (resolution != 0) {
 							chosen.Reveal(true);
