@@ -33,7 +33,8 @@ public class Card : MonoBehaviour {
 	Vector3 destination;
 	public bool revealed = false;
 
-	public int[] prediction;
+	// prediction array is as long as number of card types	
+	public int[] prediction = new int[Enum.GetNames(typeof(CardType)).Length-1];
 
 	public FieldSpot spot;
 
@@ -47,30 +48,31 @@ public class Card : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		// initialize and fill predictions vector
+		 
+
 		border.renderer.enabled = false;
 		//type = CardType.NONE;
 		name = type.ToString();
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
 		originalScale = this.transform.localScale;
 		
-		// initialize and fill predictions vector
-		prediction = new int[Enum.GetNames(typeof(CardType)).Length]; // prediction array is as long as number of card types
-		updatePrediction(CardType.ZEUS, 1);
-		updatePrediction(CardType.ARGUS, 1);
-		updatePrediction(CardType.DIONYSUS, 2);
-		updatePrediction(CardType.HADES, 1);
-		updatePrediction(CardType.MEDUSA, 4);
-		updatePrediction(CardType.PANDORA, 1);
-		updatePrediction(CardType.PEGASUS, 9);
-		updatePrediction(CardType.PERSEPHONE, 1);
-		updatePrediction(CardType.PYTHIA, 2);
-		updatePrediction(CardType.SIRENS, 1);
-		updatePrediction(CardType.HERO, 5);
-		updatePrediction(CardType.POSEIDON, 1);
-		updatePrediction(CardType.APOLLO, 2);
-		updatePrediction(CardType.GIANT, 3);
-		updatePrediction(CardType.CYCLOPS, 4);
-		updatePrediction(CardType.CENTAUR, 5);
+		// updatePrediction(CardType.ZEUS, 1);
+		// updatePrediction(CardType.ARGUS, 1);
+		// updatePrediction(CardType.DIONYSUS, 2);
+		// updatePrediction(CardType.HADES, 1);
+		// updatePrediction(CardType.MEDUSA, 4);
+		// updatePrediction(CardType.PANDORA, 1);
+		// updatePrediction(CardType.PEGASUS, 9);
+		// updatePrediction(CardType.PERSEPHONE, 1);
+		// updatePrediction(CardType.PYTHIA, 2);
+		// updatePrediction(CardType.SIRENS, 1);
+		// updatePrediction(CardType.HERO, 5);
+		// updatePrediction(CardType.POSEIDON, 1);
+		// updatePrediction(CardType.APOLLO, 2);
+		// updatePrediction(CardType.GIANT, 3);
+		// updatePrediction(CardType.CYCLOPS, 4);
+		// updatePrediction(CardType.CENTAUR, 5);
 	}
 	
 	// Update is called once per frame
@@ -117,6 +119,10 @@ public class Card : MonoBehaviour {
 	}
 
 	public void updatePrediction(CardType ct, int amount) {
+		if (prediction.Length == 0) {
+			prediction = new int[Enum.GetNames(typeof(CardType)).Length-1];
+		}
+		Debug.Log(prediction.Length);
 		prediction[(int) ct] += amount;
 	}
 

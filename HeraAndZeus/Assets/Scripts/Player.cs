@@ -11,7 +11,11 @@ public class Player : MonoBehaviour {
 
 	//public PlayerType type;
 	public int actionPoints;
-	private CardType[] deck = new CardType[43];
+
+	private CardType[] deck;
+	private Card[] allCards;
+	public CardType[] forceDeck;
+
 	public List<Card> hand;
 	public List<Card> drawPile;
 	public List<Card> discardPile;
@@ -39,6 +43,12 @@ public class Player : MonoBehaviour {
 
 	// Use this for initialization
 	protected void Start () {
+		if (forceDeck != null && forceDeck.Length > 0) {
+			deck = forceDeck;
+		} else {
+		 	deck = BuildDeck();
+		}
+
 		hand = new List<Card>();
 		drawPile = new List<Card>();
 		discardPile = new List<Card>();
@@ -52,8 +62,13 @@ public class Player : MonoBehaviour {
 								- transform.forward * Card.height/2
 								- transform.forward * (Card.height + buffer);
 
-		BuildDrawPile();
+		allCards = BuildDrawPile();
+		foreach (Card c in allCards) {
+			updateAllCardPredictions(c.type, 1);
+		}
+
 		Shuffle(drawPile);
+
 		for (int i = 0; i < 9; i++){
 			Draw ();
 		}
@@ -75,7 +90,6 @@ public class Player : MonoBehaviour {
 	}
 
 	public void SetupField(){
-
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		Physics.Raycast(ray, out hit);
@@ -375,37 +389,39 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	void BuildDrawPile(){
-		BuildDeck();
+	private Card[] BuildDrawPile(){
 		foreach (CardType type in deck){
 			Card c = GameObject.Instantiate(cardPrefab, drawPilePos, Quaternion.identity) as Card;
 			c.SetType(type);
 			c.SetFlip(false);
 			c.owner = this;
 			drawPile.Add(c);
-//			Debug.Log(c);
 		}
+		return drawPile.ToArray();
 	}
 
-	void BuildDeck() {
+	private CardType[] BuildDeck() {
+		CardType[] d = new CardType[43];
 		for (int i = 0; i < 43; i++) {
-			if (i < 1)			deck[i] = CardType.ZEUS;		// 1
-			else if (i < 2)		deck[i] = CardType.ARGUS;		// 1
-			else if (i < 4)		deck[i] = CardType.DIONYSUS;	// 2
-			else if (i < 5)		deck[i] = CardType.HADES;		// 1
-			else if (i < 9)		deck[i] = CardType.MEDUSA;		// 4
-			else if (i < 10)	deck[i] = CardType.PANDORA;		// 1
-			else if (i < 19)	deck[i] = CardType.PEGASUS;		// 9
-			else if (i < 20)	deck[i] = CardType.PERSEPHONE;	// 1
-			else if (i < 22)	deck[i] = CardType.PYTHIA;		// 2
-			else if (i < 23)	deck[i] = CardType.SIRENS;		// 1
-			else if (i < 28)	deck[i] = CardType.HERO;		// 5
-			else if (i < 29)	deck[i] = CardType.POSEIDON;	// 1
-			else if (i < 31)	deck[i] = CardType.APOLLO;		// 2
-			else if (i < 34)	deck[i] = CardType.GIANT;		// 3
-			else if (i < 38)	deck[i] = CardType.CYCLOPS;		// 4
-			else 				deck[i] = CardType.CENTAUR;		// 5
+			if (i < 1)			d[i] = CardType.ZEUS;		// 1
+			else if (i < 2)		d[i] = CardType.ARGUS;		// 1
+			else if (i < 4)		d[i] = CardType.DIONYSUS;	// 2
+			else if (i < 5)		d[i] = CardType.HADES;		// 1
+			else if (i < 9)		d[i] = CardType.MEDUSA;		// 4
+			else if (i < 10)	d[i] = CardType.PANDORA;	// 1
+			else if (i < 19)	d[i] = CardType.PEGASUS;	// 9
+			else if (i < 20)	d[i] = CardType.PERSEPHONE;	// 1
+			else if (i < 22)	d[i] = CardType.PYTHIA;		// 2
+			else if (i < 23)	d[i] = CardType.SIRENS;		// 1
+			else if (i < 28)	d[i] = CardType.HERO;		// 5
+			else if (i < 29)	d[i] = CardType.POSEIDON;	// 1
+			else if (i < 31)	d[i] = CardType.APOLLO;		// 2
+			else if (i < 34)	d[i] = CardType.GIANT;		// 3
+			else if (i < 38)	d[i] = CardType.CYCLOPS;	// 4
+			else 				d[i] = CardType.CENTAUR;	// 5
 		}
+
+		return d;
 	}
 
 	void BuildPlayField(){
@@ -508,6 +524,12 @@ public class Player : MonoBehaviour {
 			if (s == spot) return true;
 		}
 		return false;
+	}
+
+	public void updateAllCardPredictions(CardType ct, int amount) {
+		foreach (Card card in allCards) {
+			card.updatePrediction(ct, amount);
+		}
 	}
 
 	/*
