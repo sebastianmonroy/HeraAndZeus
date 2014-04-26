@@ -130,7 +130,7 @@ public class Card : MonoBehaviour {
 				predictVector[(int) ctype]++;
 			}
 		}
-		Debug.Log(predictVector.Length);
+//		Debug.Log(predictVector.Length);
 		predictVector[(int) ct] += amount;
 
 		if (predictVector[(int) ct] < 0) {

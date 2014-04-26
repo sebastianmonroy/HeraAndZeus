@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class ResolveChallenge : MonoBehaviour {
+public static class ResolveChallenge {
 
 	/*
 	 * 3*16*16 matrix
@@ -74,15 +74,8 @@ public class ResolveChallenge : MonoBehaviour {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}}; 
 	
-	void Start(){
 
-	}
-
-	void Update(){
-
-	}
-
-	public static int resolve(int context, CardType attacker, CardType defender){
+	public static int ChallengeResult(int context, CardType attacker, CardType defender){
 		Debug.Log ("Challenge!" + "\nAttacker: " + attacker + "  Defender: " + defender + "  Resolution: " + resolveTable[context, (int)attacker, (int)defender]);
 		return resolveTable[context, (int)attacker, (int)defender];
 	}
