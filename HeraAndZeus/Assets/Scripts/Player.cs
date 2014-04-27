@@ -7,7 +7,7 @@ public enum PlayerType {
 }
 
 public enum MythPhase {
-	NONE, PYTHIA, HADES, DIONYSUS, PERSEPHONE
+	NONE, PYTHIA, HADES, DIONYSUS
 }
 
 public class Player : MonoBehaviour {
@@ -237,8 +237,6 @@ public class Player : MonoBehaviour {
 					}
 				}
 			}
-		} else if (phase == MythPhase.PERSEPHONE) {
-
 		} else{
 			if (overSpot != null){
 				if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
@@ -292,6 +290,14 @@ public class Player : MonoBehaviour {
 								SelectCard(chosen);
 								chosen = null;
 								phase = MythPhase.DIONYSUS;
+							} else if (selectedCard.type == CardType.PERSEPHONE && discardPile.Contains(chosen) != null) {
+								actionPoints--;
+								List<Card> pegs = GetPegsFromDiscard();
+								Discard(selectedCard);
+								SelectCard(null);
+								chosen = null;
+								hand.AddRange(pegs);
+								ArrangeHand();
 							}
 						}
 					} else if (FindOnField(chosen) != null){
@@ -589,6 +595,20 @@ public class Player : MonoBehaviour {
 			}
 		}
 		return null;
+	}
+
+	public List<Card> GetPegsFromDiscard() {
+		List<Card> pegs = new List<Card>();
+		foreach (Card c in discardPile) {
+			if (c.type == CardType.PEGASUS) {
+				if (pegs.Count < 3) {
+					pegs.Add(c);
+				} else {
+					break;
+				}
+			}
+		}
+		return pegs;
 	}
 
 	public bool MakeGap(FieldSpot spot){
