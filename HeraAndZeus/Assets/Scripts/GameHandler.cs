@@ -108,11 +108,13 @@ public class GameHandler : MonoBehaviour {
 
 	public void SwitchPlayer(){
 		if (activePlayer == p1){
+			p2.selectedCard = null;
 			activePlayer = p2;
 			inactivePlayer = p1;
 			p2.BeginTurn();
 		}
 		else {
+			p1.selectedCard = null;
 			activePlayer = p1;
 			inactivePlayer = p2;
 			p1.BeginTurn();
