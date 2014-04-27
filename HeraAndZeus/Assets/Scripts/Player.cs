@@ -49,6 +49,9 @@ public class Player : MonoBehaviour {
 	//Play(Card, int column);
 	//Challenge(int column); (calls GameHandler.Instance to resolve);
 
+	// TO DO:
+	// can't draw Argus for initial hand
+	// can use Pegasus to destroy own Zeus
 
 	// Use this for initialization
 	protected void Start () {
