@@ -219,8 +219,8 @@ public class Card : MonoBehaviour {
 
 	public void Flip(bool flipBool) {
 		// only flips the card if it isn't in desired
-		if (flipping) {
-			SetFlip(!isFlipped)
+		if (flipping){
+			SetFlip(isFlipped);
 		}
 
 		if (isFlipped != flipBool) {
