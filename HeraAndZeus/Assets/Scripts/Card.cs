@@ -21,7 +21,6 @@ public class Card : MonoBehaviour {
 	public bool special;
 
 	public bool moving;
-	public bool inField = false;
 	public bool flipping;
 	public bool isFlipped = false;
 	public bool picking;
@@ -81,12 +80,17 @@ public class Card : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// if this card is ZEUS and it is in the field, must be revealed
+		if (type == CardType.ZEUS && spot != null && (!revealed || !isFlipped)) {
+			Reveal(true);
+			//Flip(true);
+		}
+
 		if (moving) {
 			this.transform.position = Vector3.Lerp(this.transform.position, destination, 0.1f);
 			if (Vector3.Distance(this.transform.position, destination) <= 0.1f) {
 				this.transform.position = destination;
 				moving = false;
-				inField = true;
 			}
 		} else if (picking) {
 			this.transform.position = Vector3.Lerp(this.transform.position, destination, 0.1f);
@@ -219,8 +223,9 @@ public class Card : MonoBehaviour {
 		if (flipping){
 			SetFlip(isFlipped);
 		}
+
 		if (isFlipped != flipBool) {
-				flipping = true;
+			flipping = true;
 		}
 	}
 

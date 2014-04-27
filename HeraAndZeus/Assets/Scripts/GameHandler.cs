@@ -126,11 +126,13 @@ public class GameHandler : MonoBehaviour {
 
 	public void SwitchPlayer(){
 		if (activePlayer == p1){
+			p2.selectedCard = null;
 			activePlayer = p2;
 			inactivePlayer = p1;
 			p2.BeginTurn();
 		}
 		else {
+			p1.selectedCard = null;
 			activePlayer = p1;
 			inactivePlayer = p2;
 			p1.BeginTurn();
@@ -167,7 +169,7 @@ public class GameHandler : MonoBehaviour {
 			Debug.Log("Special Case: Pythia reveals opponent's hand");
 			activePlayer.actionPoints ++;
 			Card target = null;
-			activePlayer.pythiaPhase = true;
+			activePlayer.phase = MythPhase.PYTHIA;
 			foreach (Card c in inactivePlayer.hand){
 				if (c.type == CardType.POSEIDON){
 					target = c;
@@ -213,7 +215,7 @@ public class GameHandler : MonoBehaviour {
 	public void EndPythiaPhase(){
 		foreach (Card c in inactivePlayer.hand){
 			c.Flip(inactivePlayer.showHand);
-			Debug.Log(inactivePlayer.showHand);
+			//Debug.Log(inactivePlayer.showHand);
 		}
 		Player.Shuffle(inactivePlayer.hand);
 		inactivePlayer.ArrangeHand();

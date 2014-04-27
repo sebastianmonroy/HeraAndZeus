@@ -8,6 +8,10 @@ public enum PlayerType {
 	HERA, ZEUS
 }
 
+public enum MythPhase {
+	NONE, PYTHIA, HADES, DIONYSUS, PERSEPHONE
+}
+
 public class Player : MonoBehaviour {
 	int buffer = 3;
 
@@ -39,10 +43,7 @@ public class Player : MonoBehaviour {
 
 	public bool showHand;
 
-	public bool pythiaPhase;
-	public bool hadesPhase;
-	public bool zeusPhase;
-	public bool dionysusPhase;
+	public MythPhase phase = MythPhase.NONE;
 	
 
 	//Play(Card, int column);
@@ -213,35 +214,45 @@ public class Player : MonoBehaviour {
 			}
 		}
 
-		if (pythiaPhase){
+		if (phase == MythPhase.PYTHIA){
 			if (leftClick){
-				pythiaPhase = false;
+				phase = MythPhase.NONE;
 				GameHandler.Instance.EndPythiaPhase();
 				actionPoints --;
 			}
-		}
+		} else if (phase == MythPhase.HADES){
 
-		else if (hadesPhase){
-
-		}
-
-		else if (zeusPhase){
-
-		}
-
-		else if (dionysusPhase){
-
-		}
-
-		else{
+		} else if (phase == MythPhase.DIONYSUS){
 			if (overSpot != null){
-				if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
-					if (FindOnField(selectedCard) == null)
-					MakeGap(overSpot);
-	//				gapSpot = overSpot;
+				if (overSpot.card != null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
+					if (overSpot.card.type != CardType.ZEUS && ((selectedCard.spot.col == overSpot.col && selectedCard.spot.row != overSpot.row - 1) || selectedCard.spot.row == overSpot.row) && overSpot != selectedCard.spot) {
+						MakeGap(overSpot);
+					}
 				}
 			}
-			
+
+			if (leftClick && heldCard == null) {
+				if (hit.transform.tag == "Spot") {
+					FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
+					if (chosen.row == selectedCard.spot.row || (chosen.col == selectedCard.spot.col)) {
+						Play(selectedCard, chosen);
+						SelectCard(null);
+						phase = MythPhase.NONE;
+					}
+				}
+			}
+		} else if (phase == MythPhase.PERSEPHONE) {
+
+		} else{
+			if (overSpot != null){
+				if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
+					if (FindOnField(selectedCard) == null) {
+						if (overSpot.card.type != CardType.ZEUS && selectedCard == null || (selectedCard.type != CardType.ZEUS && selectedCard.strength != -1) || (selectedCard.type == CardType.ZEUS && overSpot.row == 0)) {
+							MakeGap(overSpot);
+						}
+					}
+				}
+			}
 			
 			if (leftClick && heldCard == null) {
 				if (hit.transform.tag == "Card") {
@@ -250,14 +261,12 @@ public class Player : MonoBehaviour {
 						SelectCard(null);
 					} else if (hand.Contains(chosen)){
 						SelectCard(chosen);
-					} else if (FindOnField(chosen) != null){
-						SelectCard(chosen);
-					}else if (drawPile.Contains(chosen)){
+					} else if (drawPile.Contains(chosen)){
 						Draw();
 					} else if (chosen != null && selectedCard != null) {
+						//Debug.Log(chosen.owner);
 						// player has selected card and chosen card
 						if (chosen.owner != this) {
-							//Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
 							int context = 3;
 							// clicked on enemy card
 							if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
@@ -279,8 +288,18 @@ public class Player : MonoBehaviour {
 								actionPoints --;
 							}
 							SelectCard(null);
-
+						} else {
+							// clicked on own card
+							if (selectedCard.type == CardType.DIONYSUS && FindOnField(chosen) != null) {
+								// selected DIONYSUS and clicked on any card in own field
+								Discard(selectedCard);
+								SelectCard(chosen);
+								chosen = null;
+								phase = MythPhase.DIONYSUS;
+							}
 						}
+					} else if (FindOnField(chosen) != null){
+						SelectCard(chosen);
 					}
 				} else if (hit.transform.tag == "Spot") {
 					FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
@@ -317,7 +336,11 @@ public class Player : MonoBehaviour {
 			//GameHandler.Instance.EndGame();
 		}
 		else 
-			actionPoints = NumOccupiedColumns();
+			if (FindOnField(CardType.ZEUS) != null) {
+				actionPoints = 4;
+			} else {
+				actionPoints = NumOccupiedColumns();
+			}
 	}
 
 
@@ -341,7 +364,6 @@ public class Player : MonoBehaviour {
 			discardPile.Add(card);
 			card.Reveal(true);
 			card.MoveTo(discardPilePos);
-			card.inField = false;
 			spot.card = null;
 			ArrangeField();
 			return true;
@@ -349,7 +371,6 @@ public class Player : MonoBehaviour {
 		else if (hand.Contains(card)){
 			card.Reveal(true);
 			discardPile.Add(card);
-			card.Flip(false);
 			card.MoveTo(discardPilePos);
 			hand.Remove(card);
 			ArrangeHand();
@@ -364,7 +385,7 @@ public class Player : MonoBehaviour {
 		if (card.strength > -1) {
 			if (spot.card != null){//there is already a card in the target spot
 
-				if (NextAvailableSpot(spot.col) == null){ //the column is full or card is not playable in the field
+				if (NextAvailableSpot(spot.col) == null){ //the column is full
 
 					return false; //play unsuccessful
 				}		
@@ -380,16 +401,35 @@ public class Player : MonoBehaviour {
 			}
 			else{ // this spot is unoccupied
 				spot = NextAvailableSpot(spot.col); //ge the next available spot in this column
+				//Debug.Log(spot);
+				// ZEUS can not be played in empty column
+				if (card.type == CardType.ZEUS && spot.row == 0) {
+					return false;
+				}
 			}
 
+			// ZEUS can only be played in front row
+			if (card.type == CardType.ZEUS && spot.row != 0) {
+				return false;
+			}
+			FieldSpot old_spot = FindOnField(card);
+			if (old_spot != null) 
+				old_spot.card = null;
 			spot.card = card;
 			card.spot = spot;
 			card.MoveTo(spot.transform.position + Vector3.up * 2);
 			hand.Remove(card);
 
 			ArrangeHand();
+			ArrangeField();
 			card.Flip(false);
 			actionPoints --;
+
+			this.updateAllCardPredictions(CardType.DIONYSUS, -2);
+			this.updateAllCardPredictions(CardType.HADES, -1);
+			this.updateAllCardPredictions(CardType.PERSEPHONE, -1);
+			this.updateAllCardPredictions(CardType.SIRENS, -1);
+			this.updateAllCardPredictions(CardType.ZEUS, -1);
 			return true;
 		} else {
 			return false;
@@ -510,12 +550,13 @@ public class Player : MonoBehaviour {
 			Card card = hand[i];
 			card.MoveTo(left + this.transform.right * (Card.width + buffer) * i);
 			if (showHand)
-			card.Flip(showHand);
+				card.Flip(showHand);
 		}
 	}
 
 	//Will eliminate gaps in the play field, push everything to the top of its column
 	public void ArrangeField(){
+		//Debug.Log("arranged field");
 		for (int col = 0; col < 3; col++){
 			if (NextAvailableSpot(col) != null){ // if the column is not full
 			for (int row = 0; row < 4; row++){
@@ -539,6 +580,15 @@ public class Player : MonoBehaviour {
 	public FieldSpot FindOnField(Card card){
 		foreach (FieldSpot spot in playField){
 			if (spot.card == card){
+				return spot;
+			}
+		}
+		return null;
+	}
+
+	public FieldSpot FindOnField(CardType ct){
+		foreach (FieldSpot spot in playField){
+			if (spot.card != null && spot.card.type == ct){
 				return spot;
 			}
 		}
