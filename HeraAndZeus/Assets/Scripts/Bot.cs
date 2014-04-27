@@ -76,9 +76,13 @@ public class Bot : Player {
 		if (!(ie.Algorithm is VariationalMessagePassing))
 		{
 			Debug.Log(ie.Infer<Bernoulli>(firstCoin));
-			Variable<CardType> myCard = Variable.EnumDiscrete<CardType>(testProbs).Named("myCard");
-			DiscreteEnum<CardType> dist = ie.Infer<DiscreteEnum<CardType>>(myCard);
-			//Debug.Log("Probability distribution: " + dist;
+			//Variable<CardType> myCard = Variable.EnumDiscrete<CardType>(testProbs).Named("myCard");
+			//DiscreteEnum<CardType>[] dist = ie.Infer<DiscreteEnum<CardType>[]>(myCard);
+
+			Variable<int> myCard = Variable.Discrete(testProbs);
+			Discrete dist = ie.Infer<Discrete>(myCard);
+			//DiscreteEnum<CardType>[] dist = ie.Infer<DiscreteEnum<CardType>[]>(myCard);
+			Debug.Log("Probability distribution: " + dist[(int)CardType.ZEUS]);
 		}
 		else
 			Debug.Log("This example does not run with Variational Message Passing");
