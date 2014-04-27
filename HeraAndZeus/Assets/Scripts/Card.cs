@@ -80,9 +80,9 @@ public class Card : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		// if this card is ZEUS and it is in the field, must be revealed
-		if (!moving && type == CardType.ZEUS && spot != null && (!revealed || !isFlipped)) {
+		if (type == CardType.ZEUS && spot != null && (!revealed || !isFlipped)) {
 			Reveal(true);
-			Flip(true);
+			//Flip(true);
 		}
 
 		if (moving) {

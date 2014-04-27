@@ -169,7 +169,7 @@ public class GameHandler : MonoBehaviour {
 			Debug.Log("Special Case: Pythia reveals opponent's hand");
 			activePlayer.actionPoints ++;
 			Card target = null;
-			activePlayer.pythiaPhase = true;
+			activePlayer.phase = MythPhase.PYTHIA;
 			foreach (Card c in inactivePlayer.hand){
 				if (c.type == CardType.POSEIDON){
 					target = c;
