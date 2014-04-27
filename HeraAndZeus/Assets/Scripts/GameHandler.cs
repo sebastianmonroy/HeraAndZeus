@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using MicrosoftResearch.Infer.Models;
+using MicrosoftResearch.Infer;
 
 public class GameHandler : MonoBehaviour {
 
@@ -105,8 +107,6 @@ public class GameHandler : MonoBehaviour {
 		activePlayer = p2;
 		inactivePlayer = p1;
 
-		p1.actionPoints = 12;
-		p2.actionPoints = 12;
 	}
 	
 	// Update is called once per frame

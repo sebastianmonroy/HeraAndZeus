@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+
 public enum CardType {
 	//HERA, IO, AMAZON, NEMESIS, ARTEMIS, HYDRA, HARPY, FURY,		// HERA cards
 	ZEUS, ARGUS, HERO, POSEIDON, APOLLO, GIANT, CYCLOPS, CENTAUR,	// ZEUS cards

@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MicrosoftResearch.Infer.Models;
+using MicrosoftResearch.Infer;
 
 public enum PlayerType {
 	HERA, ZEUS
@@ -76,6 +78,8 @@ public class Player : MonoBehaviour {
 			Draw ();
 		}
 
+		actionPoints = 3;
+
 		BuildPlayField();
 
 		ArrangeHand();
@@ -84,11 +88,11 @@ public class Player : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	protected void Update () {
 		actionPointText.text = actionPoints.ToString();
 	}
 
-	public void SetupField(){
+	public virtual void SetupField(){
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		bool raycast = Physics.Raycast(ray, out hit);
@@ -159,7 +163,7 @@ public class Player : MonoBehaviour {
 
 	}
 
-	public void CheckInput(){
+	public virtual void CheckInput(){
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		bool raycast = Physics.Raycast(ray, out hit);
