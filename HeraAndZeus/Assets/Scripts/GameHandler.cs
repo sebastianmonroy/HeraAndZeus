@@ -20,17 +20,17 @@ public class GameHandler : MonoBehaviour {
 	 * 3 : Both cards are discarded
 	 */
 	static int[,,] challengeTable = new int[,,] {{ 
-			//Field to Field
-			//                            |P|    
-			//                            |E|    
-			//        |P|       |D|       |R|    
-			//        |O|   |C|C|I|   |P|P|S|
-			//        |S|A| |Y|E|O| |M|A|E|E|P|S|
-			//    |A| |E|P|G|C|N|N|H|E|N|G|P|Y|I|
-			//  |Z|R|H|I|O|I|L|T|Y|A|D|D|A|H|T|R|
-			//  |E|G|E|D|L|A|O|A|S|D|U|O|S|O|H|E|
-			//  |U|U|R|O|L|N|P|U|U|E|S|R|U|N|I|N|
-			//  |S|S|O|N|O|T|S|R|S|S|A|A|S|E|A|S|
+		//Field to Field
+		//                            |P|    
+		//                            |E|    
+		//        |P|       |D|       |R|    
+		//        |O|   |C|C|I|   |P|P|S|
+		//        |S|A| |Y|E|O| |M|A|E|E|P|S|
+		//    |A| |E|P|G|C|N|N|H|E|N|G|P|Y|I|
+		//  |Z|R|H|I|O|I|L|T|Y|A|D|D|A|H|T|R|
+		//  |E|G|E|D|L|A|O|A|S|D|U|O|S|O|H|E|
+		//  |U|U|R|O|L|N|P|U|U|E|S|R|U|N|I|N|
+		//  |S|S|O|N|O|T|S|R|S|S|A|A|S|E|A|S|
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //ZEUS
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //ARGUS
 			{0,1,3,2,2,2,2,2,0,0,1,3,1,0,1,0}, //HERO
@@ -48,7 +48,7 @@ public class GameHandler : MonoBehaviour {
 			{0,3,2,2,2,2,2,2,0,0,2,3,2,0,3,0}, //PYTHIA
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},//SIRENS
 		
-		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Hand
+		   {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Hand
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -62,10 +62,10 @@ public class GameHandler : MonoBehaviour {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,3,2,2,2,2,2,2,3,3,3,3,3,3,3,3}, //If PEGASUS picks the cards with strength 3-7, opponent places the picked card in a 1st row face up. If there are no field spot to put it, it is discarded.
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0},
+			{2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},
 		
-		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Field
+		   {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Field
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -80,12 +80,30 @@ public class GameHandler : MonoBehaviour {
 			{3,2,2,2,2,2,2,2,0,0,3,2,3,2,2,2},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},
+
+		   {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Field to Hand
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}};
 	
 	// Use this for initialization
 	void Start () {
 		Instance = this;
 		activePlayer = p2;
+		inactivePlayer = p1;
 
 		p1.actionPoints = 12;
 		p2.actionPoints = 12;
@@ -123,6 +141,47 @@ public class GameHandler : MonoBehaviour {
 	public int Challenge(int context, Card attacker, Card defender){
 		int result = challengeTable[context, (int)attacker.type, (int)defender.type];
 		Debug.Log ("Challenge!" + "\nAttacker: " + attacker + "  Defender: " + defender + "  Resolution: ");
+
+		//SPECIAL CASES
+		if (defender.type == CardType.PANDORA){
+			Debug.Log("Special Case: Pandora is Challenged");
+			//if pandora is on the field, discard all from that column
+			if (inactivePlayer.FindOnField(defender)){
+				while(inactivePlayer.playField[0,defender.spot.col].card != null){
+					inactivePlayer.Discard(inactivePlayer.playField[0,defender.spot.col].card);
+				}
+				while(activePlayer.playField[0,2-defender.spot.col].card != null){
+					activePlayer.Discard(activePlayer.playField[0,2-defender.spot.col].card);
+				}
+			}
+			
+			//if pandora is in hand, discard all in hand
+			else if (inactivePlayer.hand.Contains(defender)){
+				while(inactivePlayer.hand.Count > 0){
+					inactivePlayer.Discard(inactivePlayer.hand[0]);
+				}
+			}
+		}
+
+		if (attacker.type == CardType.PYTHIA && context == 1){
+			Debug.Log("Special Case: Pythia reveals opponent's hand");
+			activePlayer.actionPoints ++;
+			Card target = null;
+			activePlayer.pythiaPhase = true;
+			foreach (Card c in inactivePlayer.hand){
+				if (c.type == CardType.POSEIDON){
+					target = c;
+				}
+				c.Flip(true);
+				//c.Reveal(true);
+
+			}
+			if (target!=null){
+				inactivePlayer.Discard(target);
+			}
+		}
+
+
 		switch(result) {
 		case 0:
 			Debug.Log("Invalid Challenge");
@@ -137,8 +196,8 @@ public class GameHandler : MonoBehaviour {
 			break;
 		case 3:
 			Debug.Log("Both Discarded");
-			inactivePlayer.Discard(attacker);
-			activePlayer.Discard(defender);
+			inactivePlayer.Discard(defender);
+			activePlayer.Discard(attacker);
 			break;
 		
 		default:
@@ -146,13 +205,18 @@ public class GameHandler : MonoBehaviour {
 			break;
 		}
 
-		//SPECIAL CASES
-		if (defender.type == CardType.PANDORA){
-			foreach (FieldSpot spot in inactivePlayer.playField){
 
-			}
-		}
 
 		return result;
+	}
+
+	public void EndPythiaPhase(){
+		foreach (Card c in inactivePlayer.hand){
+			c.Flip(inactivePlayer.showHand);
+			Debug.Log(inactivePlayer.showHand);
+		}
+		Player.Shuffle(inactivePlayer.hand);
+		inactivePlayer.ArrangeHand();
+		//inactivePlayer
 	}
 }

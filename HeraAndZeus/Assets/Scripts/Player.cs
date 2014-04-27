@@ -35,6 +35,12 @@ public class Player : MonoBehaviour {
 
 	public TextMesh actionPointText;
 
+	public bool showHand;
+
+	public bool pythiaPhase;
+	public bool hadesPhase;
+	public bool zeusPhase;
+	public bool dionysusPhase;
 	
 
 	//Play(Card, int column);
@@ -75,10 +81,6 @@ public class Player : MonoBehaviour {
 		ArrangeHand();
 
 		actionPointText.transform.position = this.transform.position - transform.right * 25 - transform.forward * 10;
-
-		//Debug.Log(Play (hand[0], 0));
-		//hand[0].Flip();
-	
 	}
 	
 	// Update is called once per frame
@@ -109,10 +111,7 @@ public class Player : MonoBehaviour {
 					//Debug.Log(name + " card chosen");
 					SelectCard(chosen);
 					//Debug.Log(name + " " + selectedCard);
-
-				} else if (drawPile.Contains(chosen)){
-					Draw();
-				} 
+				}
 			} else if (hit.transform.tag == "Spot") {
 				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
 				if (playField[chosen.row, chosen.col] == chosen && NextAvailableSpot(chosen.col).row == 0){ //does this spot belong to the active player, and is the selected column empty
@@ -172,81 +171,15 @@ public class Player : MonoBehaviour {
 				overSpot = h.transform.GetComponent<FieldSpot>();
 			}
 		}
-		
+
 		bool leftClick = Input.GetMouseButtonDown(0);
 		bool rightClick = Input.GetMouseButtonDown(1);
 		bool scrollUp = Input.GetAxis("Mouse ScrollWheel") > 0;
 		bool scrollDown = Input.GetAxis("Mouse ScrollWheel") < 0;
 		
 		ArrangeField();
-		if (overSpot != null){
-			if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
-				if (FindOnField(selectedCard) == null)
-				MakeGap(overSpot);
-//				gapSpot = overSpot;
-			}
-		}
-		//activePlayer.ArrangeField();
-		/*
-		if (selectedCard != null && hit.transform.tag == "Card"){ // push cards down to preview play
-			Card chosen = hit.transform.GetComponent<Card>();
-			FieldSpot spot = activePlayer.FindOnField(chosen);
-			if (spot != null){
-				Debug.Log("Here");
-				activePlayer.MakeGap(spot);
-				gapSpot = spot;
-			}
-		}
-		*/
-		
-		
-		if (leftClick && heldCard == null) {
-			if (hit.transform.tag == "Card") {
-				Card chosen = hit.transform.GetComponent<Card>();
-				if (selectedCard != null && selectedCard == chosen) {
-					SelectCard(null);
-				} else if (hand.Contains(chosen)){
-					SelectCard(chosen);
-				} else if (FindOnField(chosen) != null){
-					SelectCard(chosen);
-				}else if (drawPile.Contains(chosen)){
-					Draw();
-				} else if (chosen != null && selectedCard != null) {
-					// player has selected card and chosen card
-					if (chosen.owner != this) {
-						//Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
-						int context = 0;
-						// clicked on enemy card
-						if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
-							// clicked on enemy card in same column as selected card
-							context = 0;
-						} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
-							// clicked own card in hand and then enemy card in hand
-							context = 1;
-						} else if (hand.Contains(selectedCard) && chosen.spot != null && chosen.spot.row == 0) {
-							// clicked own card in hand and then enemy card in front row of field
-							context = 2;
-						}
-						int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
-						SelectCard(null);
-						
-						if (resolution != 0) {
-							chosen.Reveal(true);
-							selectedCard.Reveal(true);
-							actionPoints --;
-						}
-					}
-				}
-			} else if (hit.transform.tag == "Spot") {
-				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
-				if (playField[chosen.row, chosen.col] == chosen){ //does this spot belong to the active player
-					if (selectedCard != null){
-						Play(selectedCard, chosen);
-						SelectCard(null);
-					}
-				}
-			}
-		} else if (scrollUp) {
+
+		if (scrollUp) {
 			if (raycast && hit.transform.tag == "Card") {
 				Card card = hit.transform.gameObject.GetComponent<Card>();
 				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
@@ -276,8 +209,89 @@ public class Player : MonoBehaviour {
 			}
 		}
 
-		if (rightClick){
-			SelectCard(null);
+		if (pythiaPhase){
+			if (leftClick){
+				pythiaPhase = false;
+				GameHandler.Instance.EndPythiaPhase();
+				actionPoints --;
+			}
+		}
+
+		else if (hadesPhase){
+
+		}
+
+		else if (zeusPhase){
+
+		}
+
+		else if (dionysusPhase){
+
+		}
+
+		else{
+			if (overSpot != null){
+				if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
+					if (FindOnField(selectedCard) == null)
+					MakeGap(overSpot);
+	//				gapSpot = overSpot;
+				}
+			}
+			
+			
+			if (leftClick && heldCard == null) {
+				if (hit.transform.tag == "Card") {
+					Card chosen = hit.transform.GetComponent<Card>();
+					if (selectedCard != null && selectedCard == chosen) {
+						SelectCard(null);
+					} else if (hand.Contains(chosen)){
+						SelectCard(chosen);
+					} else if (FindOnField(chosen) != null){
+						SelectCard(chosen);
+					}else if (drawPile.Contains(chosen)){
+						Draw();
+					} else if (chosen != null && selectedCard != null) {
+						// player has selected card and chosen card
+						if (chosen.owner != this) {
+							//Debug.Log(selectedCard.spot.col == (2 -chosen.spot.col));
+							int context = 3;
+							// clicked on enemy card
+							if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
+								// clicked on enemy card in same column as selected card
+								context = 0;
+							} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
+								// clicked own card in hand and then enemy card in hand
+								context = 1;
+							} else if (hand.Contains(selectedCard) && chosen.spot != null && chosen.spot.row == 0) {
+								// clicked own card in hand and then enemy card in front row of field
+								context = 2;
+							}
+
+							int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
+
+							if (resolution != 0) {
+								chosen.Reveal(true);
+								selectedCard.Reveal(true);
+								actionPoints --;
+							}
+							SelectCard(null);
+
+						}
+					}
+				} else if (hit.transform.tag == "Spot") {
+					FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
+					if (playField[chosen.row, chosen.col] == chosen){ //does this spot belong to the active player
+						if (selectedCard != null){
+							Play(selectedCard, chosen);
+							SelectCard(null);
+						}
+					}
+				}
+			} 
+
+			if (rightClick){
+				SelectCard(null);
+			}
 		}
 
 	}
@@ -316,10 +330,10 @@ public class Player : MonoBehaviour {
 	}
 
 	public bool Discard(Card card){
-		Debug.Log("Discarding: " + card.type);
+		//Debug.Log("Discarding: " + card.type);
 		FieldSpot spot = FindOnField(card);
 		if (spot != null){
-//			Debug.Log (this.name + " discards from field " + card.type);
+			//Debug.Log (this.name + " discards from field " + card.type);
 			discardPile.Add(card);
 			card.Reveal(true);
 			card.MoveTo(discardPilePos);
@@ -329,6 +343,7 @@ public class Player : MonoBehaviour {
 			return true;
 		}
 		else if (hand.Contains(card)){
+			card.Reveal(true);
 			discardPile.Add(card);
 			card.Flip(false);
 			card.MoveTo(discardPilePos);
@@ -369,7 +384,7 @@ public class Player : MonoBehaviour {
 			hand.Remove(card);
 
 			ArrangeHand();
-			card.Flip();
+			card.Flip(false);
 			actionPoints --;
 			return true;
 		} else {
@@ -390,7 +405,7 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	void Shuffle(List<Card> cards){
+	public static void Shuffle(List<Card> cards){
 		int n = cards.Count;
 		while (n > 1) {
 			int k = (Random.Range(0, n) % n);
@@ -480,7 +495,7 @@ public class Player : MonoBehaviour {
 		return num;
 	}
 
-	void ArrangeHand(){
+	public void ArrangeHand(){
 		Vector3 left = transform.position 
 				- transform.forward * (Card.height + buffer) * 4
 				- transform.forward * Card.height/2
@@ -490,7 +505,8 @@ public class Player : MonoBehaviour {
 		for (int i = 0; i < hand.Count; i++){
 			Card card = hand[i];
 			card.MoveTo(left + this.transform.right * (Card.width + buffer) * i);
-			card.Flip(true);
+			if (showHand)
+			card.Flip(showHand);
 		}
 	}
 

@@ -18,5 +18,6 @@ public class Bot : Player {
 	}
 
 	public void SetupField(){
+
 	}
 }
