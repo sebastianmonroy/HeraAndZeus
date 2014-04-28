@@ -5,14 +5,20 @@ using MicrosoftResearch.Infer;
 
 public class GameHandler : MonoBehaviour {
 
-	public Player p1;
-	public Player p2;
+	Player p1;
+	Player p2;
+
+	public Player human1;
+	public Player human2;
+	public Bot bot;
 	
 	Player activePlayer;
 	Player inactivePlayer;
 
 	public GUIText endMessage;
 	bool gameOver = false;
+
+	public bool botOpponent;
 
 	public static GameHandler Instance;
 
@@ -105,8 +111,23 @@ public class GameHandler : MonoBehaviour {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}};
 	
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		Instance = this;
+		human1.gameObject.SetActive(true);
+		p1 = human1;
+
+		//human2.enabled = false;
+		//bot.enabled = false;
+		if (botOpponent){
+			p2 = bot;
+			bot.gameObject.SetActive(true);
+			human2.gameObject.SetActive(false);
+		}
+		else{
+			p2 = human2;
+			bot.gameObject.SetActive(false);
+			human2.gameObject.SetActive(true);
+		}
 		activePlayer = p2;
 		inactivePlayer = p1;
 		endMessage.enabled = false;
@@ -125,8 +146,9 @@ public class GameHandler : MonoBehaviour {
 				p1.SetupField();
 				p2.SetupField();
 			}
-			else if (activePlayer.actionPoints <= 0)
+			else if (activePlayer.actionPoints <= 0){
 				SwitchPlayer();
+			}
 			else activePlayer.CheckInput();
 
 			if (activePlayer.actionPoints > 0){//check to see if the active player has remaining action points and no moves
@@ -259,7 +281,7 @@ public class GameHandler : MonoBehaviour {
 
 
 
-		return result;
+		return result; 
 	}
 
 	public void EndPythiaPhase(){
@@ -270,5 +292,13 @@ public class GameHandler : MonoBehaviour {
 		Player.Shuffle(inactivePlayer.hand);
 		inactivePlayer.ArrangeHand();
 		//inactivePlayer
+	}
+
+	
+	public GameState GetState(){
+		GameState state = new GameState();
+		state.Build(activePlayer, inactivePlayer);
+//		Debug.Log(activePlayer);
+		return state;
 	}
 }

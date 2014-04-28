@@ -183,7 +183,7 @@ public class Card : MonoBehaviour {
 		int sum = 0;
 		foreach (int i in predictVector) {
 			sum += i;
-		}
+		} 
 
 		for (int i = 0; i < predictVector.Length; i++) {
 			probabilities[i] = (float) (predictVector[i]) / sum;
@@ -328,7 +328,7 @@ public class Card : MonoBehaviour {
 				break;
 				*/
 			case CardType.ZEUS:
-				this.strength = 8;
+				this.strength = -1;
 				this.special = true;
 				break;
 			case CardType.ARGUS:

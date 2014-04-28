@@ -42,16 +42,14 @@ public class Player : MonoBehaviour {
 	public TextMesh actionPointText;
 
 	public bool showHand;
-	public int hadesIndex = 0;
+	private int hadesIndex = 0;
+
 	public MythPhase phase = MythPhase.NONE;
 	
 
 	//Play(Card, int column);
 	//Challenge(int column); (calls GameHandler.Instance to resolve);
 
-	// TO DO:
-	// can't draw Argus for initial hand
-	// can use Pegasus to destroy own Zeus
 
 	// Use this for initialization
 	protected void Start () {
@@ -136,11 +134,10 @@ public class Player : MonoBehaviour {
 					if (heldCard != null && chosen != heldCard) {
 						// put down currently held up card
 						heldCard.HoldUp(false);
-						// hold up card
+						// hold up chosen
 						chosen.HoldUp(true);
 						heldCard = chosen;
 						SelectCard(null);
-
 					} else if (heldCard == null) {
 						// hold up chosen
 						chosen.HoldUp(true);
@@ -347,7 +344,7 @@ public class Player : MonoBehaviour {
 								chosen.HoldUp(true);
 								chosen = null;
 								phase = MythPhase.HADES;
-							}
+ 							}
 						}
 					} else if (FindOnField(chosen) != null){
 						SelectCard(chosen);
@@ -383,16 +380,12 @@ public class Player : MonoBehaviour {
 	}
 
 
-	public void BeginTurn(){
-		if (NumOccupiedColumns() == 0) {
-			//GameHandler.Instance.EndGame();
+	public virtual void BeginTurn(){
+		if (FindOnField(CardType.ZEUS) != null) {
+			actionPoints = 4;
+		} else {
+			actionPoints = NumOccupiedColumns();
 		}
-		else 
-			if (FindOnField(CardType.ZEUS) != null) {
-				actionPoints = 4;
-			} else {
-				actionPoints = NumOccupiedColumns();
-			}
 	}
 
 
@@ -688,22 +681,4 @@ public class Player : MonoBehaviour {
 			card.updatePredictionVector(ct, amount);
 		}
 	}
-	/*
-	public void Insert(Card oldCard, Card newCard) {
-		if (oldCard.spot.row < 4) {
-			int col = oldCard.spot.col;
-			int row = oldCard.spot.row;
-			FieldSpot lastSpot = NextAvailableSpot(col);
-			if (lastSpot != null) {
-				for (int r = lastSpot.row; r > row; r--) {
-					Card thisCard = playField[r-1, col].card;
-					Move(thisCard, playField[r, col]);
-				}
-				Play(newCard, col);
-			}
-		} else {
-			Play(newCard, oldCard.spot.col);
-		}
-	}
-	*/
 }
