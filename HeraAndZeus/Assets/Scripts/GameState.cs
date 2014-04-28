@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum MoveType{PLAY, CHALLENGE, DRAW}
 
@@ -160,11 +161,11 @@ public class GameState{
 		float result = 0;
 
 		// My unflipped cards 1st row * 2 + my flipped cards / 2 + my cards in other rows 
-		int bound0 = myField.GetUpperBound(0);
-		int bound1 = myField.GetUpperBound(1);
-		for (int i = 0; i <= bound0; i++)
+		int row = myField[0].Length;
+		int col = myField.Length;
+		for (int i = 0; i <= row; i++)
 		{
-			for (int j = 0; j <= bound1; j++)
+			for (int j = 0; j <= col; j++)
 			{
 				if ( i == 0 && myField[i,j] != null && myField[i,j].isFlipped == false ){
 					Debug.Log("My unflipped 1st row");
