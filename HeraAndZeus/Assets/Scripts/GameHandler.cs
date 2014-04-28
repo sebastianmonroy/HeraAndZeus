@@ -152,6 +152,10 @@ public class GameHandler : MonoBehaviour {
 	}
 
 	public void SwitchPlayer(){
+		if (activePlayer.playField[0,0].card == null && activePlayer.playField[0,1].card == null && activePlayer.playField[0,2].card == null){
+			EndGame(inactivePlayer);
+		}
+		
 		if (activePlayer == p1){
 			p2.selectedCard = null;
 			activePlayer = p2;
