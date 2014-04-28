@@ -12,8 +12,8 @@ public class GameHandler : MonoBehaviour {
 	public Player human2;
 	public Bot bot;
 	
-	Player activePlayer;
-	Player inactivePlayer;
+	public Player activePlayer;
+	public Player inactivePlayer;
 
 	public GUIText endMessage;
 	bool gameOver = false;
@@ -26,6 +26,11 @@ public class GameHandler : MonoBehaviour {
 
 	public static GameHandler Instance;
 
+	Vector2 scrollPosition = Vector2.zero;
+	public bool scrollLock;
+	float logHeight = 0;
+
+	
 	/*
 	 * 3*16*16 matrix
 	 * [context, attacker, defender]
@@ -140,12 +145,14 @@ public class GameHandler : MonoBehaviour {
 	}
 
 	void Start(){
+		scrollPosition.y = Mathf.Infinity;
 		Log("Begin Game");
 
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		//Log ("test");
 		if (gameOver){
 			if (Input.GetMouseButtonDown(0)){
 				Application.LoadLevel(Application.loadedLevel);
@@ -274,25 +281,24 @@ public class GameHandler : MonoBehaviour {
 			challengeLog += (attacker.name + " Wins");
 			attacker.Reveal(true);
 			inactivePlayer.Discard(defender);
+			Log (challengeLog);
 			break;
 		case 2:
 			challengeLog +=(defender.name + " Wins");
 			activePlayer.Discard(attacker);
 			defender.Reveal(true);
+			Log (challengeLog);
 			break;
 		case 3:
 			challengeLog += ("Both Discarded");
 			inactivePlayer.Discard(defender);
 			activePlayer.Discard(attacker);
+			Log (challengeLog);
 			break;
 		default:
 			Debug.Log("Something is very wrong");
 			break;
 		}
-
-		Log (challengeLog);
-
-
 
 		return result; 
 	}
@@ -323,14 +329,30 @@ public class GameHandler : MonoBehaviour {
 	void OnGUI(){
 		GUI.skin = guiSkin;
 
-		GUI.Box(new Rect(Screen.width - Screen.width/3,0,Screen.width/3,Screen.height), GameLog);
-		Vector2 scrollPosition = Vector2.one;
+		//GUI.Box(new Rect(Screen.width - Screen.width/3,0,Screen.width/3,Screen.height), GameLog);
 
-		scrollPosition = GUI.BeginScrollView(new Rect(10, 300, 100, 100), scrollPosition, new Rect(0, 0, 220, 200));
-		GUI.Button(new Rect(0, 0, 100, 20), "Top-left");
-		GUI.Button(new Rect(120, 0, 100, 20), "Top-right");
-		GUI.Button(new Rect(0, 180, 100, 20), "Bottom-left");
-		GUI.Button(new Rect(120, 180, 100, 20), "Bottom-right");
-		GUI.EndScrollView();
+		//scrollPosition = GUI.BeginScrollView(new Rect(Screen.width - Screen.width/3,0,Screen.width/3 -20,Screen.height-20), scrollPosition, new Rect(0,0,200,200));
+
+		//scrollPosition = 
+		GUI.BeginGroup(new Rect(Screen.width - Screen.width/3 -10, 10, Screen.width/3, 400));
+			if (GUI.Button(new Rect(Screen.width/3 - 100, 300, 100, 20), "Scroll Lock")){
+				scrollLock = !scrollLock;
+			}
+		if (scrollLock) {
+			scrollPosition.y = Mathf.Infinity;
+			GUI.BeginScrollView(	new Rect(0,0, Screen.width/3, 300), 
+			                    	scrollPosition, 
+			                    	new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20) + 10));
+		}
+		else{
+			scrollPosition = GUI.BeginScrollView(	new Rect(0,0, Screen.width/3, 300), 
+		                                     		scrollPosition, 
+		                                     		new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20) + 10));
+		}
+			GUI.Box(new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20)), GameLog);
+			GUI.EndScrollView();
+			
+
+		GUI.EndGroup();
 	}
 }

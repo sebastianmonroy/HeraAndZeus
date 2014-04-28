@@ -139,6 +139,15 @@ public class Bot : Player {
 				break;
 			case CardType.PYTHIA:
 				break;
+			case CardType.SIRENS:
+				Card taken = GameHandler.Instance.inactivePlayer.drawPile[(GameHandler.Instance.inactivePlayer.drawPile.Count-1)];
+				GameHandler.Instance.inactivePlayer.discardPile.Remove(taken);
+				hand.Add(taken);
+				GameHandler.Log(name + " plays " + m.playCard.name + " and takes " + taken.name);
+
+				actionPoints --;
+
+				break;
 			}
 			break;
 			GameHandler.Log(name + " plays " + m.playCard.name);
