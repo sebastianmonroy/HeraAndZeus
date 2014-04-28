@@ -241,7 +241,7 @@ public class Player : MonoBehaviour {
 
 			if (leftClick && raycast){
 				FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
-				if (selectedCard.owner.playField[chosen.row, chosen.col] == chosen){ //does this spot belong to the active player
+				if (chosen == selectedCard.owner.playField[chosen.row, chosen.col] && chosen.row == 0){ //does this spot belong to the active player
 					selectedCard.owner.actionPoints++;
 					selectedCard.owner.Play(selectedCard, chosen);
 					SelectCard(null);
@@ -399,7 +399,7 @@ public class Player : MonoBehaviour {
 								chosen.HoldUp(true);
 								chosen = null;
 								phase = MythPhase.SIRENS;
- 							} else if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
+ 							} else if (selectedCard.spot != null && chosen.spot != null && chosen.spot.row == 0 && selectedCard.spot.col == (2 -chosen.spot.col)) {
 								// clicked on enemy card in same column as selected card
 								context = 0;
 							} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
@@ -410,9 +410,11 @@ public class Player : MonoBehaviour {
 								context = 2;
 							}
 
+							Debug.Log("context " + context);
+
 							if (context != 3) {
 								int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
-								if ((resolution == 2 || resolution == 3) && selectedCard.type == CardType.PEGASUS && chosen.owner.hand.Contains(chosen) != null) {
+								if (context == 1 && resolution == 2 && selectedCard.type == CardType.PEGASUS && chosen.owner.hand.Contains(chosen) != null) {
 	 								SelectCard(chosen);
 	 								chosen = null;
 	 								phase = MythPhase.PEGASUS;

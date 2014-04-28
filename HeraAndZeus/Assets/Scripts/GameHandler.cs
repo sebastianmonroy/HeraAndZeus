@@ -83,7 +83,7 @@ public class GameHandler : MonoBehaviour {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{2,3,2,2,2,2,2,2,3,3,3,3,3,3,3,3}, //If PEGASUS picks the cards with strength 3-7, opponent places the picked card in a 1st row face up. If there are no field spot to put it, it is discarded.
+			{3,3,2,2,2,2,2,2,3,3,3,3,3,3,3,3}, //If PEGASUS picks the cards with strength 3-7, opponent places the picked card in a 1st row face up. If there are no field spot to put it, it is discarded.
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},
