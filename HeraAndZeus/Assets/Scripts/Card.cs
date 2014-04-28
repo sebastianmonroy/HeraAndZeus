@@ -109,7 +109,7 @@ public class Card : MonoBehaviour {
 					SetFlip(true);
 				}
 			}
-		} else if (picking && !forceMove) {
+		} else if (picking) {
 			if (debug)	Debug.Log("picking");
 			this.transform.position = Vector3.Lerp(this.transform.position, pickDestination, 0.1f);
 			this.transform.localScale = Vector3.Lerp(this.transform.localScale, desiredScale, 0.1f);
@@ -284,7 +284,7 @@ public class Card : MonoBehaviour {
 			SetFlip(isFlipped);
 		}
 
-		if (isFlipped != flipBool) {
+		if (isFlipped != flipBool && !revealed) {
 			flipping = true;
 		}
 	}

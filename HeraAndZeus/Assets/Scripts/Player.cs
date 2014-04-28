@@ -9,7 +9,7 @@ public enum PlayerType {
 }
 
 public enum MythPhase {
-	NONE, PYTHIA, HADES, DIONYSUS
+	NONE, PYTHIA, HADES, SIRENS, DIONYSUS
 }
 
 public class Player : MonoBehaviour {
@@ -42,7 +42,7 @@ public class Player : MonoBehaviour {
 	public TextMesh actionPointText;
 
 	public bool showHand;
-	private int hadesIndex = 0;
+	private int discardIndex = 0;
 
 	public MythPhase phase = MythPhase.NONE;
 	
@@ -226,39 +226,102 @@ public class Player : MonoBehaviour {
 				Card chosen = hit.transform.GetComponent<Card>();
 				if (selectedCard.type == CardType.HADES) {
 					if (chosen == heldCard) {
-						//Debug.Log("hades choose");
-						heldCard.Reveal(false);
-						heldCard.HoldUp(false);
-						Discard(selectedCard);
-						hand.Add(heldCard);
+						Debug.Log("hades choose");
+						discardPile.Remove(chosen);
+						chosen.Reveal(false);
+						chosen.HoldUp(false);
 						heldCard = null;
+						Discard(selectedCard);
+						Debug.Log("old hand = " + hand.Count);
+						hand.Add(chosen);
 						SelectCard(null);
-						ArrangeHand();
 						actionPoints--;
-						hadesIndex = 0;
+						discardIndex = 0;
 						phase = MythPhase.NONE;
+						Debug.Log("new hand = " + hand.Count);
+						ArrangeHand();
 					} else if (discardPile.Contains(chosen)) {
 						
 						heldCard.HoldUp(false);
 
-						hadesIndex++;
-						if (hadesIndex >= discardPile.Count) {
-							hadesIndex = 0;
+						discardIndex++;
+						if (discardIndex >= discardPile.Count) {
+							discardIndex = 0;
 						}
-						//Debug.Log("hades scroll " + hadesIndex);
+						//Debug.Log("hades scroll " + discardIndex);
 
-						chosen = discardPile[discardPile.Count-1-hadesIndex];
+						chosen = discardPile[discardPile.Count-1-discardIndex];
 						chosen.HoldUp(true);
 						heldCard = chosen;
+					} else if (chosen == selectedCard) {
+						heldCard.HoldUp(false);
+						heldCard = null;
+						SelectCard(null);
+						discardIndex = 0;
+						phase = MythPhase.NONE;
 					}
 				} else {
+					Debug.Log("HADES broke");
 					heldCard.HoldUp(false);
 					heldCard = null;
 					Discard(selectedCard);
-					selectedCard = null;
+					SelectCard(null);
 					actionPoints--;
+					discardIndex = 0;
 					phase = MythPhase.NONE;
 				}
+				ArrangeHand();
+			}
+		} else if (phase == MythPhase.SIRENS){
+			if (leftClick) {
+				Card chosen = hit.transform.GetComponent<Card>();
+				if (selectedCard.type == CardType.SIRENS) {
+					if (chosen == heldCard) {
+						Debug.Log("sirens choose");						
+						chosen.owner.discardPile.Remove(chosen);
+						chosen.Reveal(false);
+						chosen.HoldUp(false);
+						heldCard = null;
+						Discard(selectedCard);
+						Debug.Log("old hand = " + hand.Count);
+						hand.Add(chosen);
+						SelectCard(null);
+						actionPoints--;
+						discardIndex = 0;
+						phase = MythPhase.NONE;
+						Debug.Log("new hand = " + hand.Count);
+						ArrangeHand();
+					} else if (chosen.owner != this && chosen.owner.discardPile.Contains(chosen)) {
+						
+						heldCard.HoldUp(false);
+
+						discardIndex++;
+						if (discardIndex >= chosen.owner.discardPile.Count) {
+							discardIndex = 0;
+						}
+						//Debug.Log("hades scroll " + discardIndex);
+
+						chosen = chosen.owner.discardPile[chosen.owner.discardPile.Count-1-discardIndex];
+						chosen.HoldUp(true);
+						heldCard = chosen;
+					} else if (chosen == selectedCard) {
+						heldCard.HoldUp(false);
+						heldCard = null;
+						SelectCard(null);
+						discardIndex = 0;
+						phase = MythPhase.NONE;
+					}
+				} else {
+					Debug.Log("SIRENS broke");
+					heldCard.HoldUp(false);
+					heldCard = null;
+					Discard(selectedCard);
+					SelectCard(null);
+					actionPoints--;
+					discardIndex = 0;
+					phase = MythPhase.NONE;
+				}
+				ArrangeHand();
 			}
 		} else if (phase == MythPhase.DIONYSUS){
 			if (overSpot != null){
@@ -279,7 +342,7 @@ public class Player : MonoBehaviour {
 					}
 				}
 			}
-		} else{
+		} else {
 			if (overSpot != null){
 				if (overSpot.card !=null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
 					if (FindOnField(selectedCard) == null) {
@@ -290,7 +353,7 @@ public class Player : MonoBehaviour {
 				}
 			}
 			
-			if (leftClick && heldCard == null) {
+			if (leftClick && heldCard == null && raycast) {
 				if (hit.transform.tag == "Card") {
 					Card chosen = hit.transform.GetComponent<Card>();
 					if (selectedCard != null && selectedCard == chosen) {
@@ -305,7 +368,14 @@ public class Player : MonoBehaviour {
 						if (chosen.owner != this) {
 							int context = 3;
 							// clicked on enemy card
-							if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
+							if (selectedCard.type == CardType.SIRENS && chosen.owner.discardPile.Contains(chosen) != null) {
+ 								discardIndex = 0;
+ 								chosen = chosen.owner.discardPile[chosen.owner.discardPile.Count-1-discardIndex];
+								heldCard = chosen;
+								chosen.HoldUp(true);
+								chosen = null;
+								phase = MythPhase.SIRENS;
+ 							} else if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
 								// clicked on enemy card in same column as selected card
 								context = 0;
 							} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
@@ -316,12 +386,14 @@ public class Player : MonoBehaviour {
 								context = 2;
 							}
 
-							int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
+							if (context != 3) {
+								int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
 
-							if (resolution != 0) {
-								actionPoints --;
-							}
-							SelectCard(null);
+								if (resolution != 0) {
+									actionPoints --;
+								}
+								SelectCard(null);
+							}							
 						} else {
 							// clicked on own card
 							if (selectedCard.type == CardType.DIONYSUS && FindOnField(chosen) != null) {
@@ -339,7 +411,8 @@ public class Player : MonoBehaviour {
 								hand.AddRange(pegs);
 								ArrangeHand();
 							} else if (selectedCard.type == CardType.HADES && discardPile.Contains(chosen) != null) {
-								chosen = discardPile[discardPile.Count-1-hadesIndex];
+								discardIndex = 0;
+								chosen = discardPile[discardPile.Count-1-discardIndex];
 								heldCard = chosen;
 								chosen.HoldUp(true);
 								chosen = null;
