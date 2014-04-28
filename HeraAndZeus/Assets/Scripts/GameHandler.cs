@@ -236,26 +236,6 @@ public class GameHandler : MonoBehaviour {
 		string challengeLog = ("Challenge! Attacker: " + attacker.name + "  Defender: " + defender.name + "  Resolution: ");
 
 		//SPECIAL CASES
-		if (defender.type == CardType.PANDORA && result != 0){
-			Debug.Log("Special Case: Pandora is Challenged");
-			//if pandora is on the field, discard all from that column
-			if (inactivePlayer.FindOnField(defender)){
-				while(inactivePlayer.playField[0,defender.spot.col].card != null){
-					inactivePlayer.Discard(inactivePlayer.playField[0,defender.spot.col].card);
-				}
-				while(activePlayer.playField[0,2-defender.spot.col].card != null){
-					activePlayer.Discard(activePlayer.playField[0,2-defender.spot.col].card);
-				}
-			}
-			
-			//if pandora is in hand, discard all in hand
-			else if (inactivePlayer.hand.Contains(defender)){
-				while(inactivePlayer.hand.Count > 0){
-					inactivePlayer.Discard(inactivePlayer.hand[0]);
-				}
-			}
-		}
-
 		if (attacker.type == CardType.PYTHIA && context == 1){
 			Debug.Log("Special Case: Pythia reveals opponent's hand");
 			activePlayer.actionPoints ++;
@@ -271,9 +251,10 @@ public class GameHandler : MonoBehaviour {
 			}
 			if (target!=null){
 				inactivePlayer.Discard(target);
+				activePlayer.Discard(attacker);
 			}
-		} else if (attacker.type == CardType.PYTHIA && context == 2) {
-			Debug.Log("Special Case: Pythia reveals opponent's column");
+		} else if (attacker.type == CardType.PYTHIA && (context == 0 || context == 2)) {
+			Debug.Log("Special Case: Pythia reveals opponent's row");
 			if (inactivePlayer.FindOnField(defender) != null) {
 				for (int i = 0; i < 4; i++) {
 					FieldSpot spot = inactivePlayer.playField[i, defender.spot.col];
@@ -281,8 +262,27 @@ public class GameHandler : MonoBehaviour {
 						spot.card.Reveal(true);
 					}
 				}
+				activePlayer.Discard(attacker);
 			}
-		}
+		} else if (defender.type == CardType.PANDORA){
+			Debug.Log("Special Case: Pandora is Challenged");
+			//if pandora is on the field, discard all from that column
+			if (inactivePlayer.FindOnField(defender)){
+				for (int i = 0; i < 4; i++) {
+					if (inactivePlayer.playField[i,defender.spot.col].card != null)
+						inactivePlayer.Discard(inactivePlayer.playField[i,defender.spot.col].card);
+					if (activePlayer.playField[i,2-defender.spot.col].card != null)
+						activePlayer.Discard(activePlayer.playField[i,2-defender.spot.col].card);
+				}
+			}
+			
+			//if pandora is in hand, discard all in hand
+			else if (inactivePlayer.hand.Contains(defender)){
+				while(inactivePlayer.hand.Count > 0){
+					inactivePlayer.Discard(inactivePlayer.hand[0]);
+				}
+			}
+		} 
 
 		if (defender.type == CardType.ARGUS && result != 0){
 			Debug.Log("Special Case: Argus has been attacked");
