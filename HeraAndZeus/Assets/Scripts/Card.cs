@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 
 public enum CardType {
-	//HERA, IO, AMAZON, NEMESIS, ARTEMIS, HYDRA, HARPY, FURY,		// HERA cards
 	ZEUS, ARGUS, HERO, POSEIDON, APOLLO, GIANT, CYCLOPS, CENTAUR,	// ZEUS cards
 	DIONYSUS, HADES, MEDUSA, PANDORA, PEGASUS, PERSEPHONE, PYTHIA, SIRENS,	// common cards
+	//HERA, IO, AMAZON, NEMESIS, ARTEMIS, HYDRA, HARPY, FURY,		// HERA cards
 	NONE
 }
 
@@ -31,7 +31,8 @@ public class Card : MonoBehaviour {
 
 	public bool typeSet = false;
 	Vector3 goalRotation;
-	Vector3 destination;
+	Vector3 moveDestination;
+	Vector3 pickDestination;
 	public bool showText = false;
 
 	public bool revealed = false;
@@ -58,7 +59,7 @@ public class Card : MonoBehaviour {
 		//type = CardType.NONE;
 		name = type.ToString();
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
-		originalScale = this.transform.localScale;
+		
 		
 		// updatePrediction(CardType.ZEUS, 1);
 		// updatePrediction(CardType.ARGUS, 1);
@@ -80,28 +81,33 @@ public class Card : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (originalScale == Vector3.zero && this.transform.localScale != Vector3.zero) {
+			originalScale = this.transform.localScale;
+			desiredScale = 5 * originalScale;
+		}
+
 		// if this card is ZEUS and it is in the field, must be revealed
 		if (type == CardType.ZEUS && spot != null && (!revealed || !isFlipped)) {
 			Reveal(true);
 			//Flip(true);
 		}
 
-		if (moving) {
-			this.transform.position = Vector3.Lerp(this.transform.position, destination, 0.1f);
-			if (Vector3.Distance(this.transform.position, destination) <= 0.1f) {
-				this.transform.position = destination;
-				moving = false;
-			}
-		} else if (picking) {
-			this.transform.position = Vector3.Lerp(this.transform.position, destination, 0.1f);
-			this.transform.localScale = Vector3.Lerp(this.transform.localScale,desiredScale, 0.1f);
-			if (Vector3.Distance(this.transform.position, destination) <= 0.1f 
+		if (picking) {
+			this.transform.position = Vector3.Lerp(this.transform.position, pickDestination, 0.1f);
+			this.transform.localScale = Vector3.Lerp(this.transform.localScale, desiredScale, 0.1f);
+			if (Vector3.Distance(this.transform.position, pickDestination) <= 0.1f 
 					&& Vector3.Distance(this.transform.localScale, desiredScale) <= 0.1f) {
-				this.transform.position = destination;
+				this.transform.position = pickDestination;
 				picking = false;
 				isPickedUp = !isPickedUp;
 			}
-
+		} else if (moving) {
+			this.transform.position = Vector3.Lerp(this.transform.position, moveDestination, 0.1f);
+			if (Vector3.Distance(this.transform.position, moveDestination) <= 0.1f) {
+				this.transform.position = moveDestination;
+				originalPosition = this.transform.position;
+				moving = false;
+			}
 		}
 
 		if (flipping) {
@@ -185,7 +191,7 @@ public class Card : MonoBehaviour {
 
 	public void MoveTo(Vector3 dest){
 		moving = true;
-		destination = dest;
+		moveDestination = dest;
 	}
 
 	public void Reveal(bool revBool) {
@@ -201,15 +207,47 @@ public class Card : MonoBehaviour {
 	}
 
 	public void HoldUp(bool pickBool) {
-		if (pickBool != isPickedUp && isFlipped) {
-			picking = true;
-			if (isPickedUp) {
-				destination = originalPosition;
-				desiredScale = originalScale;
-			} else {
-				originalPosition = this.transform.position;
-				destination = Camera.main.transform.position - Vector3.up * 1;
-				desiredScale = 5 * originalScale;
+		if (isFlipped) {
+			// if (isPickedUp) {
+			// 	pickDestination = originalPosition;
+			// 	desiredScale = originalScale;
+			// } else {
+			// 	originalPosition = this.transform.position;
+			// 	pickDestination = Camera.main.transform.position - Vector3.up * 1;
+			// 	desiredScale = 5 * originalScale;
+			// }
+
+			if (pickBool) {		// want to pick it up
+				if (isPickedUp) {	// already picked up
+					if (picking) {		// is being put down
+						isPickedUp = false;
+						pickDestination = Camera.main.transform.position - Vector3.up * 1;
+						desiredScale = 5 * originalScale;
+						picking = true;
+					}
+				} else {			// not already picked up
+					if (!picking) {		// is not being picked up
+						originalPosition = this.transform.position;
+						pickDestination = Camera.main.transform.position - Vector3.up * 1;
+						desiredScale = 5 * originalScale;
+						picking = true;
+					}
+				} 
+			} else {			// want to put it back down
+				if (isPickedUp) {	// already picked up
+					if (!picking) {		// is not being put down
+						pickDestination = originalPosition;
+						desiredScale = originalScale;
+						picking = true;
+					}
+				} else {			// not picked up
+					if (picking) {		// is being picked up
+						isPickedUp = true;
+						pickDestination = originalPosition;
+						desiredScale = originalScale;
+						picking = true;
+					}
+				}
 			}
 		}
 	}
