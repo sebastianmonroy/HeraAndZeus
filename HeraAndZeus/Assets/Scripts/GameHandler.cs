@@ -27,7 +27,7 @@ public class GameHandler : MonoBehaviour {
 	public static GameHandler Instance;
 
 	Vector2 scrollPosition = Vector2.zero;
-	public bool scrollLock;
+	public bool scrollLock = true;
 	public bool debug;
 	float logHeight = 0;
 
@@ -160,6 +160,8 @@ public class GameHandler : MonoBehaviour {
 			RaycastHit[] hitAll = Physics.RaycastAll(ray);
 			
 			Card hoverCard = null;
+			cardData = "";
+
 			foreach (RaycastHit h in hitAll){
 				if (h.transform.tag == "Card"){
 					hoverCard = h.transform.GetComponent<Card>();
@@ -231,7 +233,7 @@ public class GameHandler : MonoBehaviour {
 	public int Challenge(int context, Card attacker, Card defender){
 		int result = challengeTable[context, (int)attacker.type, (int)defender.type];
 		Debug.Log ("Challenge!" + "\nAttacker: " + attacker + "  Defender: " + defender + "  Resolution: ");
-		string challengeLog = ("Challenge!" + "\nAttacker: " + attacker.name + "  Defender: " + defender.name + "  Resolution: ");
+		string challengeLog = ("Challenge! Attacker: " + attacker.name + "  Defender: " + defender.name + "  Resolution: ");
 
 		//SPECIAL CASES
 		if (defender.type == CardType.PANDORA && result != 0){
@@ -270,7 +272,8 @@ public class GameHandler : MonoBehaviour {
 			if (target!=null){
 				inactivePlayer.Discard(target);
 			}
-		} else if (attacker.type == CardType.PYTHIA && (context == 0|| context == 2)) {
+		} else if (attacker.type == CardType.PYTHIA && context == 2) {
+			Debug.Log("Special Case: Pythia reveals opponent's column");
 			if (inactivePlayer.FindOnField(defender) != null) {
 				for (int i = 0; i < 4; i++) {
 					FieldSpot spot = inactivePlayer.playField[i, defender.spot.col];

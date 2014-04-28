@@ -310,7 +310,7 @@ public class Player : MonoBehaviour {
 						if (chosen.owner != this) {
 							int context = 3;
 							// clicked on enemy card
-							if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col)) {
+							if (selectedCard.spot != null && chosen.spot != null && selectedCard.spot.col == (2 -chosen.spot.col) && selectedCard.spot.row == 0 && chosen.spot.row == 0) {
 								// clicked on enemy card in same column as selected card
 								context = 0;
 							} else if (hand.Contains(selectedCard) && chosen.owner.hand.Contains(chosen)) {
