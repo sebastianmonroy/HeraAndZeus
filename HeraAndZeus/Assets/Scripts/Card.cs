@@ -318,7 +318,7 @@ public class Card : MonoBehaviour {
 				break;
 				*/
 			case CardType.ZEUS:
-				this.strength = 8;
+				this.strength = -1;
 				this.special = true;
 				break;
 			case CardType.ARGUS:
