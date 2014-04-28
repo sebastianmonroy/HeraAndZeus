@@ -30,7 +30,7 @@ public class GameHandler : MonoBehaviour {
 	 * 2 : Defender wins, attacker's card is discarded
 	 * 3 : Both cards are discarded
 	 */
-	static int[,,] challengeTable = new int[,,] {{ 
+	public static int[,,] challengeTable = new int[,,] {{ 
 		//Field to Field
 		//                            |P|    
 		//                            |E|    
@@ -71,7 +71,7 @@ public class GameHandler : MonoBehaviour {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,3,2,2,2,2,2,2,3,3,3,3,3,3,3,3}, //If PEGASUS picks the cards with strength 3-7, opponent places the picked card in a 1st row face up. If there are no field spot to put it, it is discarded.
+			{2,3,2,2,2,2,2,2,3,3,3,3,3,3,3,3}, //If PEGASUS picks the cards with strength 3-7, opponent places the picked card in a 1st row face up. If there are no field spot to put it, it is discarded.
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2},
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},
@@ -202,7 +202,7 @@ public class GameHandler : MonoBehaviour {
 		Debug.Log ("Challenge!" + "\nAttacker: " + attacker + "  Defender: " + defender + "  Resolution: ");
 
 		//SPECIAL CASES
-		if (defender.type == CardType.PANDORA){
+		if (defender.type == CardType.PANDORA && result != 0){
 			Debug.Log("Special Case: Pandora is Challenged");
 			//if pandora is on the field, discard all from that column
 			if (inactivePlayer.FindOnField(defender)){

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-public enum MoveType{PLAY, CHALLENGE, DRAW}
+public enum MoveType{PLAY, CHALLENGE, DRAW, HADES, PERSEPHONE, SIREN, DIONYSUS}
 
 public struct Move{
 	public MoveType type;
@@ -65,13 +65,36 @@ public class GameState{
 					}
 				}
 			}
+			//each mythological card can be played out of the hand
+
 		}
 
-		//each mythological card can be played out of the hand
 
 
 		//each column can be used to challenge if valid
-		//if (myField[0,0].card)
+		if (myField[0,0].card != null && otherField[0,2].card != null && GameHandler.challengeTable[0, (int)myField[0,0].card.type, (int)otherField[0,2].card.type] != 0){
+			Move challenge = new Move();
+			challenge.type = MoveType.CHALLENGE;
+			challenge.attacker = myField[0,0].card;
+			challenge.defender = otherField[0,2].card;
+			possibleMoves.Add(challenge);
+		}
+		if (myField[0,1].card != null && otherField[0,1].card != null && GameHandler.challengeTable[0, (int)myField[0,1].card.type, (int)otherField[0,1].card.type] != 0){
+			Move challenge = new Move();
+			challenge.type = MoveType.CHALLENGE;
+			challenge.attacker = myField[0,1].card;
+			challenge.defender = otherField[0,1].card;
+			possibleMoves.Add(challenge);
+
+		}
+		if (myField[0,2].card != null && otherField[0,0].card != null && GameHandler.challengeTable[0, (int)myField[0,2].card.type, (int)otherField[0,0].card.type] != 0){
+			Move challenge = new Move();
+			challenge.type = MoveType.CHALLENGE;
+			challenge.attacker = myField[0,2].card;
+			challenge.defender = otherField[0,0].card;
+			possibleMoves.Add(challenge);
+
+		}
 		return possibleMoves;
 	}
 }
