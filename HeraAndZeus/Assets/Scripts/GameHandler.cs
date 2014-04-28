@@ -111,6 +111,7 @@ public class GameHandler : MonoBehaviour {
 		inactivePlayer = p1;
 		endMessage.enabled = false;
 
+
 	}
 	
 	// Update is called once per frame
@@ -248,8 +249,6 @@ public class GameHandler : MonoBehaviour {
 			break;
 		}
 
-
-
 		return result; 
 	}
 
@@ -265,8 +264,10 @@ public class GameHandler : MonoBehaviour {
 
 	
 	public GameState GetState(){
+		Debug.Log ("GetState() called");
 		GameState state = new GameState();
 		state.Build(activePlayer, inactivePlayer);
+		Debug.Log ("Evaluation score: " + state.Eval());
 		return state;
 	}
 }

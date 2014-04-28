@@ -44,6 +44,8 @@ public class Player : MonoBehaviour {
 	public bool showHand;
 
 	public MythPhase phase = MythPhase.NONE;
+
+	public GameState currState;
 	
 
 	//Play(Card, int column);
@@ -339,6 +341,7 @@ public class Player : MonoBehaviour {
 
 
 	public virtual void BeginTurn(){
+		curState = GameHandler.Instance.GetState();
 		if (FindOnField(CardType.ZEUS) != null) {
 			actionPoints = 4;
 		} else {
