@@ -85,17 +85,17 @@ public class Bot : Player {
 
 	void ExecuteMove(Move m){
 		switch(m.type){
-		case MoveType.DRAW:
+		case MoveType.DRAW: //COMPLETE
 			Draw ();
 			GameHandler.Log(name + " draws a card ");
 
 			break;
-		case MoveType.PLAY:
+		case MoveType.PLAY: //COMPLETE
 			Play (m.playCard, m.targetSpot);
 			GameHandler.Log(name + " plays a card");
 
 			break;
-		case MoveType.CHALLENGE:
+		case MoveType.CHALLENGE: //COMPLETE
 			int context = 3;
 			if (m.attacker.spot != null && m.defender.spot != null && m.attacker.spot.col == (2 -m.defender.spot.col)) {
 				context = 0;
@@ -115,11 +115,19 @@ public class Bot : Player {
 			break;
 		case MoveType.MYTH:
 			switch(m.playCard.type){
-			case CardType.HADES:
+			case CardType.HADES: //COMPLETE
+				if (discardPile.Contains(m.hadesCard)){
+					discardPile.Remove(m.hadesCard);
+					hand.Add(m.hadesCard);
+				}
 				break;
-			case CardType.DIONYSUS:
+			case CardType.DIONYSUS: //COMPLETE
+				Discard(m.playCard);
+				m.dionysusCard.spot.card = null;
+				m.dionysusCard.spot = null;
+				Play (m.dionysusCard, m.targetSpot);
 				break;
-			case CardType.PERSEPHONE:
+			case CardType.PERSEPHONE: //COMPLETE
 				GameHandler.Log(name + " plays " + m.playCard.name);
 				Debug.Log("trying to play persephone");
 				int numPeg = 0;
@@ -137,17 +145,26 @@ public class Bot : Player {
 				ArrangeHand();
 				actionPoints --;
 				break;
-			case CardType.PYTHIA:
-
+			case CardType.PYTHIA: //COMPLETE
+				//Pythia is always handled with challenges.
 				break;
-			case CardType.SIRENS:
-				Card taken = GameHandler.Instance.inactivePlayer.drawPile[(GameHandler.Instance.inactivePlayer.drawPile.Count-1)];
-				GameHandler.Instance.inactivePlayer.discardPile.Remove(taken);
-				hand.Add(taken);
-				GameHandler.Log(name + " plays " + m.playCard.name + " and takes " + taken.name);
-
-				actionPoints --;
-
+			case CardType.SIRENS: //COMPLETE
+				Card taken = new Card();
+				bool found = false;
+				int i = GameHandler.Instance.inactivePlayer.drawPile.Count-1;
+				while(i >= 0 && !found){
+					if (GameHandler.Instance.inactivePlayer.drawPile[i].strength > 0){
+						taken = GameHandler.Instance.inactivePlayer.drawPile[i];
+						found = true;
+					}
+					i--;
+				}
+				if (found){
+					GameHandler.Instance.inactivePlayer.discardPile.Remove(taken);
+					hand.Add(taken);
+					GameHandler.Log(name + " plays " + m.playCard.name + " and takes " + taken.name);
+					actionPoints --;
+				}
 				break;
 			}
 			break;
