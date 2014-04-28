@@ -532,7 +532,7 @@ public class Player : MonoBehaviour {
 		return null;
 	}
 
-	int NumOccupiedColumns(){
+	protected int NumOccupiedColumns(){
 		int num = 0;
 		for (int col = 0; col < 3; col ++){
 			if (playField[0,col].card !=  null)

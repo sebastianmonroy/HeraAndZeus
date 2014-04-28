@@ -262,4 +262,11 @@ public class GameHandler : MonoBehaviour {
 		inactivePlayer.ArrangeHand();
 		//inactivePlayer
 	}
+
+	
+	public GameState GetState(){
+		GameState state = new GameState();
+		state.Build(activePlayer, inactivePlayer);
+		return state;
+	}
 }
