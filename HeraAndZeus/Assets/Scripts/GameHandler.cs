@@ -125,8 +125,9 @@ public class GameHandler : MonoBehaviour {
 				p1.SetupField();
 				p2.SetupField();
 			}
-			else if (activePlayer.actionPoints <= 0)
+			else if (activePlayer.actionPoints <= 0){
 				SwitchPlayer();
+			}
 			else activePlayer.CheckInput();
 
 			if (activePlayer.actionPoints > 0){//check to see if the active player has remaining action points and no moves
@@ -152,6 +153,10 @@ public class GameHandler : MonoBehaviour {
 	}
 
 	public void SwitchPlayer(){
+		if (activePlayer.playField[0,0].card == null && activePlayer.playField[0,1].card == null && activePlayer.playField[0,2].card == null){
+			EndGame(inactivePlayer);
+		}
+
 		if (activePlayer == p1){
 			p2.selectedCard = null;
 			activePlayer = p2;
