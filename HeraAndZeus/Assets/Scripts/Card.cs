@@ -83,11 +83,6 @@ public class Card : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (debug && debugCnt != predictList.Count) {
-			Debug.Log("list count = " + predictList.Count);
-			debugCnt = predictList.Count;
-		}	
-
 		if (originalScale == Vector3.zero && this.transform.localScale != Vector3.zero) {
 			originalScale = this.transform.localScale;
 			desiredScale = 5 * originalScale;
