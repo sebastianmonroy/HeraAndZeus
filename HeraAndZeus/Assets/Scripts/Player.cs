@@ -42,7 +42,7 @@ public class Player : MonoBehaviour {
 	public TextMesh actionPointText;
 
 	public bool showHand;
-
+	public int hadesIndex = 0;
 	public MythPhase phase = MythPhase.NONE;
 	
 
@@ -131,26 +131,27 @@ public class Player : MonoBehaviour {
 			}
 		} else if (scrollUp) {
 			if (raycast && hit.transform.tag == "Card") {
-				Card card = hit.transform.gameObject.GetComponent<Card>();
-				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
-					if (heldCard != null && heldCard.isPickedUp) {
+				Card chosen = hit.transform.gameObject.GetComponent<Card>();
+				if (!chosen.moving && !chosen.flipping && chosen.isFlipped) {
+					if (heldCard != null && chosen != heldCard) {
 						// put down currently held up card
 						heldCard.HoldUp(false);
 						// hold up card
-						card.HoldUp(true);
-						heldCard = card;
+						chosen.HoldUp(true);
+						heldCard = chosen;
 						SelectCard(null);
 
 					} else if (heldCard == null) {
-						// hold up card
-						card.HoldUp(true);
-						heldCard = card;
+						// hold up chosen
+						chosen.HoldUp(true);
+						heldCard = chosen;
 						SelectCard(null);
 					}
 				}
 			}
 		} else if (scrollDown) {
-			if (raycast && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard != null && heldCard.isPickedUp) {
+			Card chosen = hit.transform.gameObject.GetComponent<Card>();
+			if (raycast && chosen == heldCard && heldCard != null) {
 				// put down held card if it is already picked up
 				heldCard.HoldUp(false);
 				heldCard = null;
@@ -224,7 +225,43 @@ public class Player : MonoBehaviour {
 				actionPoints --;
 			}
 		} else if (phase == MythPhase.HADES){
+			if (leftClick) {
+				Card chosen = hit.transform.GetComponent<Card>();
+				if (selectedCard.type == CardType.HADES) {
+					if (chosen == heldCard) {
+						//Debug.Log("hades choose");
+						heldCard.HoldUp(false);
+						Discard(selectedCard);
+						hand.Add(heldCard);
+						heldCard = null;
+						SelectCard(null);
+						ArrangeHand();
+						actionPoints--;
+						hadesIndex = 0;
+						phase = MythPhase.NONE;
+					} else if (discardPile.Contains(chosen)) {
+						
+						heldCard.HoldUp(false);
 
+						hadesIndex++;
+						if (hadesIndex >= discardPile.Count) {
+							hadesIndex = 0;
+						}
+						//Debug.Log("hades scroll " + hadesIndex);
+
+						chosen = discardPile[discardPile.Count-1-hadesIndex];
+						chosen.HoldUp(true);
+						heldCard = chosen;
+					}
+				} else {
+					heldCard.HoldUp(false);
+					heldCard = null;
+					Discard(selectedCard);
+					selectedCard = null;
+					actionPoints--;
+					phase = MythPhase.NONE;
+				}
+			}
 		} else if (phase == MythPhase.DIONYSUS){
 			if (overSpot != null){
 				if (overSpot.card != null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
@@ -305,6 +342,12 @@ public class Player : MonoBehaviour {
 								chosen = null;
 								hand.AddRange(pegs);
 								ArrangeHand();
+							} else if (selectedCard.type == CardType.HADES && discardPile.Contains(chosen) != null) {
+								chosen = discardPile[discardPile.Count-1-hadesIndex];
+								heldCard = chosen;
+								chosen.HoldUp(true);
+								chosen = null;
+								phase = MythPhase.HADES;
 							}
 						}
 					} else if (FindOnField(chosen) != null){
