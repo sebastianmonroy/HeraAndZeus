@@ -9,6 +9,8 @@ public struct Move{
 	public MoveType type;
 	public FieldSpot targetSpot;
 	public Card playCard;
+	public Card dionysusCard;
+	public Card hadesCard;
 	public Card attacker;
 	public Card defender;
 
@@ -21,7 +23,9 @@ public class GameState{
 	Card[] myHand;
 	Card[] otherHand;
 	Card[] myDrawPile;
+	Card[] myDiscardPile;
 
+	
 	public void Build(Player p1, Player p2){
 		myField = new FieldSpot[4,3];
 		otherField = new FieldSpot[4,3];
@@ -36,6 +40,8 @@ public class GameState{
 		otherHand = p2.hand.ToArray();
 		myHand = p1.hand.ToArray();
 		myDrawPile = p1.drawPile.ToArray();
+		myDiscardPile = p1.discardPile.ToArray();
+
 	}
 
 	public float Eval(){
@@ -66,7 +72,31 @@ public class GameState{
 				}
 			}
 			//each mythological card can be played out of the hand
-			if (c.type == CardType.DIONYSUS || c.type == CardType.HADES || c.type == CardType.PERSEPHONE || c.type == CardType.PYTHIA){
+			if (c.type == CardType.DIONYSUS){
+				foreach (FieldSpot spot1 in myField){
+					if (spot.card != null){
+						foreach(FieldSpot spot2 in myField){
+							Move dionysus = new Move();
+							dionysus.type = MoveType.MYTH;
+							dionysus.playCard = c;
+							dionysus.dionysusCard = spot1.card;
+							dionysus.targetSpot = spot2;
+							possibleMoves.Add(dionysus);
+						}
+					}
+				}
+			}
+			if (c.type == CardType.HADES){
+				foreach (Card h in myDiscardPile){
+					Move hades = new Move();
+					hades.type = MoveType.MYTH;
+					hades.playCard = c;
+					hades.hadesCard = h;
+					possibleMoves.Add(hades);
+				}
+			}
+
+			if (c.type == CardType.PERSEPHONE || c.type == CardType.PYTHIA){
 				Move myth = new Move();
 				myth.type = MoveType.MYTH;
 				myth.playCard = c;
