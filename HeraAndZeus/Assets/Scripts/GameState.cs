@@ -71,10 +71,32 @@ public class GameState{
 					}
 				}
 			}
+
+			// pegasus and pythia can challenge a random card in the opponent's hand;
+			if (c.type == CardType.PEGASUS || c.type == CardType.PYTHIA){
+				Move handChallenge = new Move();
+				handChallenge.type = MoveType.CHALLENGE;
+				handChallenge.attacker = c;
+				handChallenge.defender = otherHand[Random.Range(0, otherHand.Length)];
+				possibleMoves.Add(handChallenge);
+			}
+
+			if (c.type == CardType.ZEUS){
+				for (int i = 0; i<3; i++){
+					if (myField[3,i].card == null){//if this column has space
+						Move zeus = new Move();
+						zeus.type = MoveType.PLAY;
+						zeus.playCard = c;
+						zeus.targetSpot = myField[0,i];
+						possibleMoves.Add(zeus);
+					}
+				}
+			}
+
 			//each mythological card can be played out of the hand
 			if (c.type == CardType.DIONYSUS){
 				foreach (FieldSpot spot1 in myField){
-					if (spot.card != null){
+					if (spot1.card != null){
 						foreach(FieldSpot spot2 in myField){
 							Move dionysus = new Move();
 							dionysus.type = MoveType.MYTH;
