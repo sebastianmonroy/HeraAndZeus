@@ -50,7 +50,7 @@ public class GameHandler : MonoBehaviour {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //PANDORA
 			{0,1,2,2,2,2,2,2,0,0,2,3,3,0,1,0}, //PEGASUS
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //PERSEPHONE
-			{0,3,2,2,2,2,2,2,0,0,2,3,2,0,3,0}, //PYTHIA
+			{0,3,2,1,2,2,2,2,0,0,2,3,2,0,3,0}, //PYTHIA
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},//SIRENS
 		
 		   {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//Hand to Hand
@@ -155,7 +155,7 @@ public class GameHandler : MonoBehaviour {
 		if (activePlayer.playField[0,0].card == null && activePlayer.playField[0,1].card == null && activePlayer.playField[0,2].card == null){
 			EndGame(inactivePlayer);
 		}
-		
+
 		if (activePlayer == p1){
 			p2.selectedCard = null;
 			activePlayer = p2;
@@ -216,6 +216,15 @@ public class GameHandler : MonoBehaviour {
 			if (target!=null){
 				inactivePlayer.Discard(target);
 			}
+		} else if (attacker.type == CardType.PYTHIA && context == 0) {
+			if (inactivePlayer.FindOnField(defender) != null) {
+				for (int i = 0; i < 4; i++) {
+					FieldSpot spot = inactivePlayer.playField[i, defender.spot.col];
+					if (spot.card != null) {
+						spot.card.Reveal(true);
+					}
+				}
+			}
 		}
 
 		if (defender.type == CardType.ARGUS && result != 0){
@@ -230,18 +239,19 @@ public class GameHandler : MonoBehaviour {
 			break;
 		case 1:
 			Debug.Log(attacker + " Wins");
+			attacker.Reveal(true);
 			inactivePlayer.Discard(defender);
 			break;
 		case 2:
 			Debug.Log(defender + " Wins");
 			activePlayer.Discard(attacker);
+			defender.Reveal(true);
 			break;
 		case 3:
 			Debug.Log("Both Discarded");
 			inactivePlayer.Discard(defender);
 			activePlayer.Discard(attacker);
 			break;
-		
 		default:
 			Debug.Log("Something is very wrong");
 			break;

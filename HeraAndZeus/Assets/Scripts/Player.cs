@@ -230,6 +230,7 @@ public class Player : MonoBehaviour {
 				if (selectedCard.type == CardType.HADES) {
 					if (chosen == heldCard) {
 						//Debug.Log("hades choose");
+						heldCard.Reveal(false);
 						heldCard.HoldUp(false);
 						Discard(selectedCard);
 						hand.Add(heldCard);
@@ -321,8 +322,6 @@ public class Player : MonoBehaviour {
 							int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);
 
 							if (resolution != 0) {
-								chosen.Reveal(true);
-								selectedCard.Reveal(true);
 								actionPoints --;
 							}
 							SelectCard(null);
@@ -414,14 +413,15 @@ public class Player : MonoBehaviour {
 		FieldSpot spot = FindOnField(card);
 		if (spot != null){
 			//Debug.Log (this.name + " discards from field " + card.type);
-			discardPile.Add(card);
+			card.spot = null;
 			card.Reveal(true);
+			discardPile.Add(card);
 			card.MoveTo(discardPilePos);
 			spot.card = null;
 			ArrangeField();
 			return true;
-		}
-		else if (hand.Contains(card)){
+		} else if (hand.Contains(card)){
+			card.spot = null;
 			card.Reveal(true);
 			discardPile.Add(card);
 			card.MoveTo(discardPilePos);
@@ -478,11 +478,11 @@ public class Player : MonoBehaviour {
 			card.Flip(false);
 			actionPoints --;
 
-			this.updateAllCardPredictions(CardType.DIONYSUS, -2);
-			this.updateAllCardPredictions(CardType.HADES, -1);
-			this.updateAllCardPredictions(CardType.PERSEPHONE, -1);
-			this.updateAllCardPredictions(CardType.SIRENS, -1);
-			this.updateAllCardPredictions(CardType.ZEUS, -1);
+			card.updatePredictionList(CardType.DIONYSUS, -2);
+			card.updatePredictionList(CardType.HADES, -1);
+			card.updatePredictionList(CardType.PERSEPHONE, -1);
+			card.updatePredictionList(CardType.SIRENS, -1);
+			card.updatePredictionList(CardType.ZEUS, -1);
 			return true;
 		} else {
 			return false;
@@ -582,7 +582,7 @@ public class Player : MonoBehaviour {
 		return null;
 	}
 
-	int NumOccupiedColumns(){
+	protected int NumOccupiedColumns(){
 		int num = 0;
 		for (int col = 0; col < 3; col ++){
 			if (playField[0,col].card !=  null)
@@ -649,10 +649,12 @@ public class Player : MonoBehaviour {
 
 	public List<Card> GetPegsFromDiscard() {
 		List<Card> pegs = new List<Card>();
+		int count = 0;
 		foreach (Card c in discardPile) {
 			if (c.type == CardType.PEGASUS) {
 				if (pegs.Count < 3) {
 					pegs.Add(c);
+					c.Reveal(false);
 				} else {
 					break;
 				}
@@ -685,7 +687,6 @@ public class Player : MonoBehaviour {
 			card.updatePredictionList(ct, amount);
 		}
 	}
-
 	/*
 	public void Insert(Card oldCard, Card newCard) {
 		if (oldCard.spot.row < 4) {

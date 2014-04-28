@@ -50,16 +50,17 @@ public class Card : MonoBehaviour {
 
 	public Player owner;
 
+	public bool debug;
+
 	// Use this for initialization
 	void Start () {
 		// initialize and fill predictVector
-		 
+		debug = false;
 
 		border.renderer.enabled = false;
 		//type = CardType.NONE;
 		name = type.ToString();
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
-		
 		
 		// updatePrediction(CardType.ZEUS, 1);
 		// updatePrediction(CardType.ARGUS, 1);
@@ -133,7 +134,13 @@ public class Card : MonoBehaviour {
 	}
 
 	public void setupPredictionVector() {
-		updatePredictionVector(CardType.ZEUS, 0);
+		updatePredictionVector((CardType) (0), 0);
+	}
+
+	public void clearPredictionVector() {
+		for (int i = 0; i < predictVector.Length; i++) {
+			predictVector[i] = 0;
+		}
 	}
 
 	public void updatePredictionVector(CardType ct, int amount) {
@@ -161,8 +168,11 @@ public class Card : MonoBehaviour {
 				predictList.Add(ct);
 			}
 		} else if (amount < 0) {
+			if (debug) 	Debug.Log("amount " + amount);
 			for (int i = 0; i > amount; i--) {
+				if (debug) 	Debug.Log("removed " + ct + " " + predictList.Count);
 				predictList.Remove(ct);
+				if (debug)	Debug.Log(predictList.Count);
 			}
 		}
 		updatePredictionVector(ct, amount);
@@ -198,9 +208,9 @@ public class Card : MonoBehaviour {
 		if (revBool && !revealed) {
 			Flip(true);
 			revealed = true;
+			if (debug)	Debug.Log("revealed");
 			this.owner.updateAllCardPredictions(type, -1);
 		} else if (!revBool && revealed) {
-			Flip(false);
 			revealed = false;
 			this.owner.updateAllCardPredictions(type, 1);
 		}
