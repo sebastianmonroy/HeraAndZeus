@@ -53,6 +53,7 @@ public class Player : MonoBehaviour {
 
 	// Use this for initialization
 	protected void Start () {
+		this.transform.position = new Vector3(0, transform.position.y, transform.position.z) - transform.right * (Card.width * 1.5f + buffer);
 		if (forceDeck != null && forceDeck.Length > 0) {
 			deck = forceDeck;
 		} else {
@@ -65,10 +66,10 @@ public class Player : MonoBehaviour {
 		playField = new FieldSpot[4,3];
 
 		drawPilePos    = this.transform.position 
-								+ transform.right * (Card.width + buffer) * 5 
+								+ transform.right * (Card.width + buffer) * 4
 								- transform.forward * Card.height/2;
 		discardPilePos = this.transform.position 
-								+ transform.right * (Card.width + buffer) * 5 
+								+ transform.right * (Card.width + buffer) * 4 
 								- transform.forward * Card.height/2
 								- transform.forward * (Card.height + buffer);
 
@@ -86,7 +87,7 @@ public class Player : MonoBehaviour {
 
 		ArrangeHand();
 
-		actionPointText.transform.position = this.transform.position - transform.right * 25 - transform.forward * 10;
+		actionPointText.transform.position = this.transform.position - transform.right * Card.width * 2 - transform.forward * 0;
 	}
 	
 	// Update is called once per frame

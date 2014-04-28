@@ -20,6 +20,10 @@ public class GameHandler : MonoBehaviour {
 
 	public bool botOpponent;
 
+	public static string GameLog;
+
+	public GUISkin guiSkin;
+
 	public static GameHandler Instance;
 
 	/*
@@ -131,6 +135,12 @@ public class GameHandler : MonoBehaviour {
 		activePlayer = p2;
 		inactivePlayer = p1;
 		endMessage.enabled = false;
+		GameLog = "";
+
+	}
+
+	void Start(){
+		Log("Begin Game");
 
 	}
 	
@@ -200,6 +210,7 @@ public class GameHandler : MonoBehaviour {
 	public int Challenge(int context, Card attacker, Card defender){
 		int result = challengeTable[context, (int)attacker.type, (int)defender.type];
 		Debug.Log ("Challenge!" + "\nAttacker: " + attacker + "  Defender: " + defender + "  Resolution: ");
+		string challengeLog = ("Challenge!" + "\nAttacker: " + attacker.name + "  Defender: " + defender.name + "  Resolution: ");
 
 		//SPECIAL CASES
 		if (defender.type == CardType.PANDORA && result != 0){
@@ -257,20 +268,20 @@ public class GameHandler : MonoBehaviour {
 
 		switch(result) {
 		case 0:
-			Debug.Log("Invalid Challenge");
+			Log("Invalid Challenge");
 			break;
 		case 1:
-			Debug.Log(attacker + " Wins");
+			challengeLog += (attacker.name + " Wins");
 			attacker.Reveal(true);
 			inactivePlayer.Discard(defender);
 			break;
 		case 2:
-			Debug.Log(defender + " Wins");
+			challengeLog +=(defender.name + " Wins");
 			activePlayer.Discard(attacker);
 			defender.Reveal(true);
 			break;
 		case 3:
-			Debug.Log("Both Discarded");
+			challengeLog += ("Both Discarded");
 			inactivePlayer.Discard(defender);
 			activePlayer.Discard(attacker);
 			break;
@@ -279,9 +290,16 @@ public class GameHandler : MonoBehaviour {
 			break;
 		}
 
+		Log (challengeLog);
+
 
 
 		return result; 
+	}
+
+	public static void Log(string message){
+		GameLog += "\n" + message;
+		//GameLog.Insert(GameLog.Length, "\n" + message);
 	}
 
 	public void EndPythiaPhase(){
@@ -300,5 +318,19 @@ public class GameHandler : MonoBehaviour {
 		state.Build(activePlayer, inactivePlayer);
 //		Debug.Log(activePlayer);
 		return state;
+	}
+
+	void OnGUI(){
+		GUI.skin = guiSkin;
+
+		GUI.Box(new Rect(Screen.width - Screen.width/3,0,Screen.width/3,Screen.height), GameLog);
+		Vector2 scrollPosition = Vector2.one;
+
+		scrollPosition = GUI.BeginScrollView(new Rect(10, 300, 100, 100), scrollPosition, new Rect(0, 0, 220, 200));
+		GUI.Button(new Rect(0, 0, 100, 20), "Top-left");
+		GUI.Button(new Rect(120, 0, 100, 20), "Top-right");
+		GUI.Button(new Rect(0, 180, 100, 20), "Bottom-left");
+		GUI.Button(new Rect(120, 180, 100, 20), "Bottom-right");
+		GUI.EndScrollView();
 	}
 }

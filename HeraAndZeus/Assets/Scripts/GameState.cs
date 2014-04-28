@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-public enum MoveType{PLAY, CHALLENGE, DRAW, HADES, PERSEPHONE, SIREN, DIONYSUS}
+public enum MoveType{PLAY, CHALLENGE, DRAW, MYTH}
 
 public struct Move{
 	public MoveType type;
@@ -66,7 +66,12 @@ public class GameState{
 				}
 			}
 			//each mythological card can be played out of the hand
-
+			if (c.type == CardType.DIONYSUS || c.type == CardType.HADES || c.type == CardType.PERSEPHONE || c.type == CardType.PYTHIA){
+				Move myth = new Move();
+				myth.type = MoveType.MYTH;
+				myth.playCard = c;
+				possibleMoves.Add(myth);
+			}
 		}
 
 

@@ -27,6 +27,8 @@ public class Bot : Player {
 	public override void CheckInput(){
 		if (delay == 0){
 			ExecuteMove(PickMove());
+			Shuffle(hand);
+			ArrangeHand();
 			delay = 1;
 		}
 	}
@@ -85,9 +87,13 @@ public class Bot : Player {
 		switch(m.type){
 		case MoveType.DRAW:
 			Draw ();
+			GameHandler.Log(name + " draws a card ");
+
 			break;
 		case MoveType.PLAY:
 			Play (m.playCard, m.targetSpot);
+			GameHandler.Log(name + " plays a card");
+
 			break;
 		case MoveType.CHALLENGE:
 			int context = 3;
@@ -107,6 +113,35 @@ public class Bot : Player {
 				actionPoints --;
 			}
 			break;
+		case MoveType.MYTH:
+			switch(m.playCard.type){
+			case CardType.HADES:
+				break;
+			case CardType.DIONYSUS:
+				break;
+			case CardType.PERSEPHONE:
+				GameHandler.Log(name + " plays " + m.playCard.name);
+				Debug.Log("trying to play persephone");
+				int numPeg = 0;
+				int index = 0;
+				while(index < discardPile.Count && numPeg < 3){
+					if (discardPile[index].type == CardType.PEGASUS){
+						hand.Add(discardPile[index]);
+						discardPile.Remove(discardPile[index]);
+						numPeg ++;
+					}
+					else
+						index++;
+				}
+				Discard(m.playCard);
+				ArrangeHand();
+				actionPoints --;
+				break;
+			case CardType.PYTHIA:
+				break;
+			}
+			break;
+			GameHandler.Log(name + " plays " + m.playCard.name);
 		}
 	}
 	

@@ -12,8 +12,8 @@ public enum CardType {
 }
 
 public class Card : MonoBehaviour {
-	public static float width = 5;
-	public static float height = 7;
+	public static float width = 10;
+	public static float height = 8;
 
 	public CardType type;
 	public string title;
@@ -61,6 +61,7 @@ public class Card : MonoBehaviour {
 		border.renderer.enabled = false;
 		//type = CardType.NONE;
 		name = type.ToString();
+		this.transform.localScale = new Vector3(width, .5f, height);
 		this.transform.eulerAngles = new Vector3(0, 0, 0);
 		
 		// updatePrediction(CardType.ZEUS, 1);
