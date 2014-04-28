@@ -11,6 +11,9 @@ public class GameHandler : MonoBehaviour {
 	Player activePlayer;
 	Player inactivePlayer;
 
+	public GUIText endMessage;
+	bool gameOver = false;
+
 	public static GameHandler Instance;
 
 	/*
@@ -106,22 +109,46 @@ public class GameHandler : MonoBehaviour {
 		Instance = this;
 		activePlayer = p2;
 		inactivePlayer = p1;
+		endMessage.enabled = false;
 
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (p1.setupPhase || p2.setupPhase){
-			p1.SetupField();
-			p2.SetupField();
+		if (gameOver){
+			if (Input.GetMouseButtonDown(0)){
+				Application.LoadLevel(Application.loadedLevel);
+			}
 		}
-		else if (activePlayer.actionPoints <= 0)
-			SwitchPlayer();
-		else activePlayer.CheckInput();
+		else{
+			if (p1.setupPhase || p2.setupPhase){
+				p1.SetupField();
+				p2.SetupField();
+			}
+			else if (activePlayer.actionPoints <= 0)
+				SwitchPlayer();
+			else activePlayer.CheckInput();
+
+			if (activePlayer.actionPoints > 0){//check to see if the active player has remaining action points and no moves
+				if (activePlayer.hand.Count ==0 && activePlayer.drawPile.Count == 0){
+					bool canAttack = false;
+					foreach (FieldSpot spot in activePlayer.playField){
+						if (spot.row == 0 && spot.card != null){
+							if (spot.card.type != CardType.MEDUSA && spot.card.type != CardType.PANDORA && spot.card.type != CardType.ZEUS){
+								canAttack = true;
+							}
+						}
+					}
+					if (!canAttack) EndGame(inactivePlayer);
+				}
+			}
+		}
 	}
 
-	public void EndGame(){
-
+	public void EndGame(Player winner){
+		endMessage.enabled = true;
+		endMessage.text = (winner.name + "\nWins!");
+		gameOver = true;
 	}
 
 	public void SwitchPlayer(){
@@ -136,6 +163,10 @@ public class GameHandler : MonoBehaviour {
 			activePlayer = p1;
 			inactivePlayer = p2;
 			p1.BeginTurn();
+		}
+
+		if (activePlayer.actionPoints < 1){
+			EndGame(inactivePlayer);
 		}
 
 	}
@@ -181,6 +212,11 @@ public class GameHandler : MonoBehaviour {
 			if (target!=null){
 				inactivePlayer.Discard(target);
 			}
+		}
+
+		if (defender.type == CardType.ARGUS && result != 0){
+			Debug.Log("Special Case: Argus has been attacked");
+			EndGame(activePlayer);
 		}
 
 

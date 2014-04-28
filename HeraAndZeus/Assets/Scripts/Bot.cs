@@ -22,7 +22,7 @@ public class Bot : Player {
 	}
 
 	public override void CheckInput(){
-
+		
 	}
 
 	void TestBayesian(){
@@ -46,10 +46,10 @@ public class Bot : Player {
 								1.0/43.0, //SIRENS
 								0};   //NONE
 
-		double[] testProbs =   {1.0/43.0, //ZEUS
-								2.0/43.0, //ARGUS
-								3.0/10.0, //HERO
-								4.0/43.0, //POSEIDON
+		double[] testProbs =   {1.0/2.0, //ZEUS
+								1.0/2.0, //ARGUS
+								0.0/10.0, //HERO
+								0.0/43.0, //POSEIDON
 								0.0/43.0, //APOLLO
 								0.0/43.0, //GIANT
 								0.0/43.0, //CYCLOPS
@@ -80,9 +80,15 @@ public class Bot : Player {
 			//DiscreteEnum<CardType>[] dist = ie.Infer<DiscreteEnum<CardType>[]>(myCard);
 
 			Variable<int> myCard = Variable.Discrete(testProbs);
+			Variable<int> myCard2 = Variable.Discrete(testProbs);
+
+			Debug.Log("Probability distribution: " + ie.Infer<Discrete>(myCard));
+
+			myCard2.ObservedValue = 0;
+
 			Discrete dist = ie.Infer<Discrete>(myCard);
-			//DiscreteEnum<CardType>[] dist = ie.Infer<DiscreteEnum<CardType>[]>(myCard);
-			Debug.Log("Probability distribution: " + dist[(int)CardType.ZEUS]);
+			Debug.Log("Probability distribution: " + ie.Infer<Discrete>(myCard));
+
 		}
 		else
 			Debug.Log("This example does not run with Variational Message Passing");

@@ -320,6 +320,7 @@ public class Player : MonoBehaviour {
 
 			if (rightClick){
 				SelectCard(null);
+				//GameHandler.Instance.EndGame(this);
 			}
 		}
 
@@ -555,8 +556,7 @@ public class Player : MonoBehaviour {
 		for (int i = 0; i < hand.Count; i++){
 			Card card = hand[i];
 			card.MoveTo(left + this.transform.right * (Card.width + buffer) * i);
-			if (showHand)
-				card.Flip(showHand);
+			card.Flip(showHand);
 		}
 	}
 
