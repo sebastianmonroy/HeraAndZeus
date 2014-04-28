@@ -39,7 +39,7 @@ public class Card : MonoBehaviour {
 
 	// prediction array is as long as number of card types	
 	public int[] predictVector = new int[Enum.GetNames(typeof(CardType)).Length-1];
-	public List<CardType> predictList = new List<CardType>();
+	//public List<CardType> predictList = new List<CardType>();
 	public FieldSpot spot;
 
 	public TextMesh titleText;
@@ -51,6 +51,7 @@ public class Card : MonoBehaviour {
 	public Player owner;
 
 	public bool debug;
+	public int debugCnt;
 
 	// Use this for initialization
 	void Start () {
@@ -82,6 +83,11 @@ public class Card : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (debug && debugCnt != predictList.Count) {
+			Debug.Log("list count = " + predictList.Count);
+			debugCnt = predictList.Count;
+		}	
+
 		if (originalScale == Vector3.zero && this.transform.localScale != Vector3.zero) {
 			originalScale = this.transform.localScale;
 			desiredScale = 5 * originalScale;
@@ -133,8 +139,13 @@ public class Card : MonoBehaviour {
 		DetermineTextVisibility();
 	}
 
-	public void setupPredictionVector() {
-		updatePredictionVector((CardType) (0), 0);
+	public void setupPredictionVector(List<CardType> allCards) {
+		if (predictVector == null || predictVector.Length == 0) {
+			predictVector = new int[Enum.GetNames(typeof(CardType)).Length-1];
+			foreach (CardType ctype in allCards) {
+				predictVector[(int) ctype]++;
+			}
+		}
 	}
 
 	public void clearPredictionVector() {
@@ -144,12 +155,6 @@ public class Card : MonoBehaviour {
 	}
 
 	public void updatePredictionVector(CardType ct, int amount) {
-		if (predictVector == null || predictVector.Length == 0) {
-			predictVector = new int[Enum.GetNames(typeof(CardType)).Length-1];
-			foreach (CardType ctype in predictList) {
-				predictVector[(int) ctype]++;
-			}
-		}
 		//Debug.Log(predictVector.Length);
 		predictVector[(int) ct] += amount;
 
@@ -158,7 +163,7 @@ public class Card : MonoBehaviour {
 		}
 	}
 
-	public void updatePredictionList(Card card, int amount) {
+	/*public void updatePredictionList(Card card, int amount) {
 		updatePredictionList(card.type, amount);
 	}
 
@@ -170,13 +175,13 @@ public class Card : MonoBehaviour {
 		} else if (amount < 0) {
 			if (debug) 	Debug.Log("amount " + amount);
 			for (int i = 0; i > amount; i--) {
-				if (debug) 	Debug.Log("removed " + ct + " " + predictList.Count);
+				//if (debug) 	Debug.Log("removed " + ct + " " + predictList.Count);
 				predictList.Remove(ct);
-				if (debug)	Debug.Log(predictList.Count);
+				//if (debug)	Debug.Log(predictList.Count);
 			}
 		}
 		updatePredictionVector(ct, amount);
-	}
+	}*/
 
 	public float[] getPredictionProbabilities() {
 		float[] probabilities = new float[predictVector.Length];

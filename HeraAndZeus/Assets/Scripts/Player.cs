@@ -478,11 +478,11 @@ public class Player : MonoBehaviour {
 			card.Flip(false);
 			actionPoints --;
 
-			card.updatePredictionList(CardType.DIONYSUS, -2);
-			card.updatePredictionList(CardType.HADES, -1);
-			card.updatePredictionList(CardType.PERSEPHONE, -1);
-			card.updatePredictionList(CardType.SIRENS, -1);
-			card.updatePredictionList(CardType.ZEUS, -1);
+			card.updatePredictionVector(CardType.DIONYSUS, -2);
+			card.updatePredictionVector(CardType.HADES, -1);
+			card.updatePredictionVector(CardType.PERSEPHONE, -1);
+			card.updatePredictionVector(CardType.SIRENS, -1);
+			card.updatePredictionVector(CardType.ZEUS, -1);
 			return true;
 		} else {
 			return false;
@@ -522,8 +522,9 @@ public class Player : MonoBehaviour {
 			c.SetType(type);
 			c.SetFlip(false);
 			c.owner = this;
-			c.predictList = allCardsList;
-			c.setupPredictionVector();
+			c.setupPredictionVector(allCardsList);
+			//c.predictList = allCardsList;
+			c.setupPredictionVector(allCardsList);
 			drawPile.Add(c);
 		}
 
@@ -684,7 +685,7 @@ public class Player : MonoBehaviour {
 
 	public void updateAllCardPredictions(CardType ct, int amount) {
 		foreach (Card card in allCards) {
-			card.updatePredictionList(ct, amount);
+			card.updatePredictionVector(ct, amount);
 		}
 	}
 	/*

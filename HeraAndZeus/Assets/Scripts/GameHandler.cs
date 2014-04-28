@@ -216,7 +216,7 @@ public class GameHandler : MonoBehaviour {
 			if (target!=null){
 				inactivePlayer.Discard(target);
 			}
-		} else if (attacker.type == CardType.PYTHIA && context == 0) {
+		} else if (attacker.type == CardType.PYTHIA && (context == 0|| context == 2)) {
 			if (inactivePlayer.FindOnField(defender) != null) {
 				for (int i = 0; i < 4; i++) {
 					FieldSpot spot = inactivePlayer.playField[i, defender.spot.col];
