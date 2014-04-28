@@ -98,4 +98,8 @@ public class Bot : Player {
 	public override void SetupField(){
 
 	}
+
+	public override void BeginTurn(){
+		GameState state = GameHandler.Instance.GetState();
+	}
 }

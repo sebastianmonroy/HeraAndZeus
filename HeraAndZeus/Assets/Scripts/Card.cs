@@ -167,7 +167,7 @@ public class Card : MonoBehaviour {
 		int sum = 0;
 		foreach (int i in predictVector) {
 			sum += i;
-		}
+		} 
 
 		for (int i = 0; i < predictVector.Length; i++) {
 			probabilities[i] = (float) (predictVector[i]) / sum;

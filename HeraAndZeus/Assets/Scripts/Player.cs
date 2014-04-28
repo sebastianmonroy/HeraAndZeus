@@ -338,16 +338,12 @@ public class Player : MonoBehaviour {
 	}
 
 
-	public void BeginTurn(){
-		if (NumOccupiedColumns() == 0) {
-			//GameHandler.Instance.EndGame();
+	public virtual void BeginTurn(){
+		if (FindOnField(CardType.ZEUS) != null) {
+			actionPoints = 4;
+		} else {
+			actionPoints = NumOccupiedColumns();
 		}
-		else 
-			if (FindOnField(CardType.ZEUS) != null) {
-				actionPoints = 4;
-			} else {
-				actionPoints = NumOccupiedColumns();
-			}
 	}
 
 
@@ -639,23 +635,4 @@ public class Player : MonoBehaviour {
 			card.updatePredictionList(ct, amount);
 		}
 	}
-
-	/*
-	public void Insert(Card oldCard, Card newCard) {
-		if (oldCard.spot.row < 4) {
-			int col = oldCard.spot.col;
-			int row = oldCard.spot.row;
-			FieldSpot lastSpot = NextAvailableSpot(col);
-			if (lastSpot != null) {
-				for (int r = lastSpot.row; r > row; r--) {
-					Card thisCard = playField[r-1, col].card;
-					Move(thisCard, playField[r, col]);
-				}
-				Play(newCard, col);
-			}
-		} else {
-			Play(newCard, oldCard.spot.col);
-		}
-	}
-	*/
 }
