@@ -409,7 +409,7 @@ public class Player : MonoBehaviour {
 			card.spot = null;
 			card.Reveal(true);
 			discardPile.Add(card);
-			card.MoveTo(discardPilePos);
+			card.MoveTo(discardPilePos, false);
 			spot.card = null;
 			ArrangeField();
 			return true;
@@ -417,7 +417,7 @@ public class Player : MonoBehaviour {
 			card.spot = null;
 			card.Reveal(true);
 			discardPile.Add(card);
-			card.MoveTo(discardPilePos);
+			card.MoveTo(discardPilePos, false);
 			hand.Remove(card);
 			ArrangeHand();
 			return true;
@@ -440,7 +440,7 @@ public class Player : MonoBehaviour {
 						if (playField[row,spot.col].card != null){
 							playField[row+1,spot.col].card = playField[row,spot.col].card;
 							playField[row,spot.col].card = null;
-							playField[row+1,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2);
+							playField[row+1,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2, true);
 						}
 					}
 				}
@@ -458,12 +458,14 @@ public class Player : MonoBehaviour {
 			if (card.type == CardType.ZEUS && spot.row != 0) {
 				return false;
 			}
+
 			FieldSpot old_spot = FindOnField(card);
 			if (old_spot != null) 
 				old_spot.card = null;
+
 			spot.card = card;
 			card.spot = spot;
-			card.MoveTo(spot.transform.position + Vector3.up * 2);
+			card.MoveTo(spot.transform.position + Vector3.up * 2, true);
 			hand.Remove(card);
 
 			ArrangeHand();
@@ -595,7 +597,7 @@ public class Player : MonoBehaviour {
 				- transform.right * ((hand.Count * Card.width) + ((hand.Count - 1) * buffer))/2;
 		for (int i = 0; i < hand.Count; i++){
 			Card card = hand[i];
-			card.MoveTo(left + this.transform.right * (Card.width + buffer) * i);
+			card.MoveTo(left + this.transform.right * (Card.width + buffer) * i, true);
 			card.Flip(showHand);
 		}
 	}
@@ -605,20 +607,20 @@ public class Player : MonoBehaviour {
 		//Debug.Log("arranged field");
 		for (int col = 0; col < 3; col++){
 			if (NextAvailableSpot(col) != null){ // if the column is not full
-			for (int row = 0; row < 4; row++){
-				FieldSpot spot = playField[row,col];
-				if (spot.card != null){
-					spot.card.MoveTo(spot.transform.position + Vector3.up * 2); //make sure everything is moving to its proper spot
-					FieldSpot nextSpot = NextAvailableSpot(col);
-					if (nextSpot.row < row){
-						Card current = playField[row,col].card;
-						nextSpot.card = current;
-						playField[row, col].card = null;
-						current.MoveTo(nextSpot.transform.position + Vector3.up * 2);
-						current.spot = nextSpot;
+				for (int row = 0; row < 4; row++){
+					FieldSpot spot = playField[row,col];
+					if (spot.card != null){
+						spot.card.MoveTo(spot.transform.position + Vector3.up * 2, false); //make sure everything is moving to its proper spot
+						FieldSpot nextSpot = NextAvailableSpot(col);
+						if (nextSpot.row < row){
+							Card current = playField[row,col].card;
+							nextSpot.card = current;
+							playField[row, col].card = null;
+							current.MoveTo(nextSpot.transform.position + Vector3.up * 2, false);
+							current.spot = nextSpot;
+						}
 					}
 				}
-			}
 			}
 		}
 	}
@@ -663,7 +665,7 @@ public class Player : MonoBehaviour {
 
 		for (int row = 2; row >= spot.row; row--){
 			if (playField[row,spot.col].card != null){
-				playField[row,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2);
+				playField[row,spot.col].card.MoveTo(playField[row+1,spot.col].transform.position + Vector3.up * 2, true);
 			}
 		}
 		return true;

@@ -29,6 +29,7 @@ public class Card : MonoBehaviour {
 	public Vector3 originalScale;
 	public Vector3 desiredScale;
 
+	public bool forceMove;
 	public bool typeSet = false;
 	Vector3 goalRotation;
 	Vector3 moveDestination;
@@ -94,7 +95,22 @@ public class Card : MonoBehaviour {
 			//Flip(true);
 		}
 
-		if (picking) {
+		if (debug)	Debug.Log("flipping = " + flipping + " forceMove = " + forceMove);
+		if (flipping && !forceMove) {
+			if (debug)	Debug.Log("flipping");
+			if (isFlipped) {
+				this.transform.eulerAngles = Vector3.Lerp(this.transform.eulerAngles, new Vector3(0, 0, 0), 0.1f);
+				if ((this.transform.eulerAngles - new Vector3(0, 0, 0)).magnitude <= 0.5f) {
+					SetFlip(false);
+				}
+			} else {
+				this.transform.eulerAngles = Vector3.Lerp(this.transform.eulerAngles, new Vector3(0, 0, 180), 0.1f);
+				if ((this.transform.eulerAngles - new Vector3(0, 0, 180)).magnitude <= 0.5f) {
+					SetFlip(true);
+				}
+			}
+		} else if (picking && !forceMove) {
+			if (debug)	Debug.Log("picking");
 			this.transform.position = Vector3.Lerp(this.transform.position, pickDestination, 0.1f);
 			this.transform.localScale = Vector3.Lerp(this.transform.localScale, desiredScale, 0.1f);
 			if (Vector3.Distance(this.transform.position, pickDestination) <= 0.1f 
@@ -104,26 +120,17 @@ public class Card : MonoBehaviour {
 				isPickedUp = !isPickedUp;
 			}
 		} else if (moving) {
+			if (debug)	Debug.Log("moving");
 			this.transform.position = Vector3.Lerp(this.transform.position, moveDestination, 0.1f);
 			if (Vector3.Distance(this.transform.position, moveDestination) <= 0.1f) {
 				this.transform.position = moveDestination;
 				originalPosition = this.transform.position;
 				moving = false;
+				forceMove = false;
+				if (debug)	Debug.Log("MAKE FORCE MOVE FALSE " + forceMove);
 			}
-		}
-
-		if (flipping) {
-			if (isFlipped) {
-				this.transform.eulerAngles = Vector3.Lerp(this.transform.eulerAngles, new Vector3(0, 0, 0), 0.1f);
-				if ((this.transform.eulerAngles - new Vector3(0, 0, 0)).magnitude <= 0.01) {
-					SetFlip(false);
-				}
-			} else {
-				this.transform.eulerAngles = Vector3.Lerp(this.transform.eulerAngles, new Vector3(0, 0, 180), 0.1f);
-				if ((this.transform.eulerAngles - new Vector3(0, 0, 180)).magnitude <= 0.01) {
-					SetFlip(true);
-				}
-			}
+		} else {
+			forceMove = false;
 		}
 
 		if (type != CardType.NONE && !typeSet) {
@@ -202,6 +209,11 @@ public class Card : MonoBehaviour {
 	public void MoveTo(Vector3 dest){
 		moving = true;
 		moveDestination = dest;
+	}
+
+	public void MoveTo(Vector3 dest, bool forceBool){
+		MoveTo(dest);
+		forceMove = forceBool || forceMove;
 	}
 
 	public void Reveal(bool revBool) {
