@@ -14,6 +14,8 @@ public class GameHandler : MonoBehaviour {
 	public GUIText endMessage;
 	bool gameOver = false;
 
+	public GameState GS;
+
 	public static GameHandler Instance;
 
 	/*
@@ -111,7 +113,7 @@ public class GameHandler : MonoBehaviour {
 		inactivePlayer = p1;
 		endMessage.enabled = false;
 
-
+		GS = new GameState();
 	}
 	
 	// Update is called once per frame
@@ -125,9 +127,9 @@ public class GameHandler : MonoBehaviour {
 			if (p1.setupPhase || p2.setupPhase){
 				p1.SetupField();
 				p2.SetupField();
-			}
-			else if (activePlayer.actionPoints <= 0){
+			} else if (activePlayer.actionPoints <= 0){
 				SwitchPlayer();
+				GS.Build(p1, p2);
 			}
 			else activePlayer.CheckInput();
 

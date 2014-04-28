@@ -14,8 +14,8 @@ public struct Move{
 
 public class GameState{
 
-	Card[,] myField;
-	Card[,] otherField;
+	Card[,] myField = new Card[4,3];
+	Card[,] otherField = new Card[4,3];
 
 	List<Card> myHand;
 	List<Card> otherHand; //If PYTHIA is used, I have knowledge about some cards in otherHand.
@@ -49,11 +49,19 @@ public class GameState{
 	public void Build(Player p1, Player p2){
 		Debug.Log("Build called");
 
-		foreach (FieldSpot spot in p1.playField){
-			myField[spot.row, spot.col] = spot.card;
-		}
-		foreach (FieldSpot spot in p2.playField){
-			otherField[spot.row, spot.col] = spot.card;
+		int row = myField.GetLength(0);
+		int col = myField.GetLength(1);
+
+		for (int i = 0; i < row; i++) {
+			for (int j = 0; j < col; j++) {
+				//if (p1.playField[i, j].card != null)
+				//Debug.Log("[" + i + ", " + j + "]");
+
+					myField[i, j] = p1.playField[i, j].card;
+
+				//if (p2.playField[i, j].card != null)
+					otherField[i, j] = p2.playField[i, j].card;
+			}
 		}
 
 		myHand = p1.hand;
@@ -162,20 +170,18 @@ public class GameState{
 
 		// My unflipped cards 1st row * 2 + my flipped cards / 2 + my cards in other rows 
 		int row = myField.GetLength(0);
-		int col = myField.Length;
-		for (int i = 0; i <= col; i++)
+		int col = myField.GetLength(1);
+		for (int i = 0; i < row; i++)
 		{
-			for (int j = 0; j <= row; j++)
+			for (int j = 0; j < col; j++)
 			{
-				if ( i == 0 && myField[i,j] != null && myField[i,j].isFlipped == false ){
+				if (j == 0 && myField[i,j] != null && myField[i,j].isFlipped == false ){
 					Debug.Log("My unflipped 1st row");
 					result += CardValue(myField[i,j]) * 2;
-				}
-				else if ( myField != null && myField[i,j].isFlipped == true ){
+				} else if (myField[i,j] != null && myField[i,j].isFlipped){
 					Debug.Log("My flipped cards");
 					result += CardValue(myField[i,j]) / 2;
-				}
-				else if (myField[i,j] != null){
+				} else if (myField[i,j] != null){
 					Debug.Log("My Cards");
 					result += CardValue(myField[i,j]);
 				}
@@ -196,12 +202,12 @@ public class GameState{
 		float result = 0;
 		// other cards revealed in the field
 		int row = myField.GetLength(0);
-		int col = myField.Length;
-		for (int i = 0; i <= col; i++)
+		int col = myField.GetLength(1);
+		for (int i = 0; i < row; i++)
 		{
-			for (int j = 0; j <= row; j++)
+			for (int j = 0; j < col; j++)
 			{
-				if ( otherField != null && otherField[i,j].isFlipped == true ){
+				if (otherField[i,j] != null && otherField[i,j].isFlipped == true ){
 					result += CardValue(otherField[i,j]);
 				}
 			}
