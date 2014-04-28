@@ -91,7 +91,7 @@ public class GameState{
 	}
 
 	public int CardValue(Card card){
-		Debug.Log ("Card Type: " + card.type.ToString);
+		Debug.Log ("Card Type: " + card.type.ToString());
 		switch(card.type){
 			case CardType.ZEUS:
 			    return 5;
@@ -161,11 +161,11 @@ public class GameState{
 		float result = 0;
 
 		// My unflipped cards 1st row * 2 + my flipped cards / 2 + my cards in other rows 
-		int row = myField[0].Length;
+		int row = myField.GetLength(0);
 		int col = myField.Length;
-		for (int i = 0; i <= row; i++)
+		for (int i = 0; i <= col; i++)
 		{
-			for (int j = 0; j <= col; j++)
+			for (int j = 0; j <= row; j++)
 			{
 				if ( i == 0 && myField[i,j] != null && myField[i,j].isFlipped == false ){
 					Debug.Log("My unflipped 1st row");
@@ -188,15 +188,18 @@ public class GameState{
 			result += CardValue (myHand [i]);
 		}
 		Debug.Log ("plus my cards in the hand : " + result);
+		return result;
 	}
 
 	public float CalculateOther (Card[,] otherField, List<Card> otherHand){
 		Debug.Log("CalculateOther called");
 		float result = 0;
 		// other cards revealed in the field
-		for (int i = 0; i <= bound0; i++)
+		int row = myField.GetLength(0);
+		int col = myField.Length;
+		for (int i = 0; i <= col; i++)
 		{
-			for (int j = 0; j <= bound1; j++)
+			for (int j = 0; j <= row; j++)
 			{
 				if ( otherField != null && otherField[i,j].isFlipped == true ){
 					result += CardValue(otherField[i,j]);
@@ -213,6 +216,7 @@ public class GameState{
 		}
 
 		Debug.Log ("Sum of other card values revealed in the field and hand: " + result);
+		return result;
 	}
 
 	public float TotalPileValue(List<Card> pile){
