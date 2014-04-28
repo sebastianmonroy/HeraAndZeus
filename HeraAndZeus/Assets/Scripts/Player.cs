@@ -530,14 +530,12 @@ public class Player : MonoBehaviour {
 	
 	
 	public bool Play(Card card, FieldSpot spot){
-		if (card.strength > -1) {
-			if (spot.card != null){//there is already a card in the target spot
+		if (card.strength > -1 || card.type == CardType.ZEUS) {
+			if (spot.card != null) {//there is already a card in the target spot
 
-				if (NextAvailableSpot(spot.col) == null){ //the column is full
-
+				if (NextAvailableSpot(spot.col) == null) { //the column is full
 					return false; //play unsuccessful
-				}		
-				else{//move every card in the target row or higher down a row to make room
+				} else {//move every card in the target row or higher down a row to make room
 					for (int row = 2; row >= spot.row; row--){
 						if (playField[row,spot.col].card != null){
 							playField[row+1,spot.col].card = playField[row,spot.col].card;
@@ -546,12 +544,11 @@ public class Player : MonoBehaviour {
 						}
 					}
 				}
-			}
-			else{ // this spot is unoccupied
+			} else { // this spot is unoccupied
 				spot = NextAvailableSpot(spot.col); //ge the next available spot in this column
 				//Debug.Log(spot);
 				// ZEUS can not be played in empty column
-				if (card.type == CardType.ZEUS && spot.row == 0) {
+				if (card.type == CardType.ZEUS && spot.row == 0 && spot.card == null) {
 					return false;
 				}
 			}
