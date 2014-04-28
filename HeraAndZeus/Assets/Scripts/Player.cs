@@ -173,9 +173,13 @@ public class Player : MonoBehaviour {
 		RaycastHit[] hitAll = Physics.RaycastAll(ray);
 		
 		FieldSpot overSpot = null;
+		Card overCard = null;
 		foreach (RaycastHit h in hitAll){
 			if (h.transform.tag == "Spot"){
 				overSpot = h.transform.GetComponent<FieldSpot>();
+			}
+			else if (h.transform.tag == "Card"){
+				overCard = h.transform.GetComponent<Card>();
 			}
 		}
 

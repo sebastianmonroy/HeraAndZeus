@@ -28,7 +28,10 @@ public class GameHandler : MonoBehaviour {
 
 	Vector2 scrollPosition = Vector2.zero;
 	public bool scrollLock;
+	public bool debug;
 	float logHeight = 0;
+
+	string cardData = "";
 
 	
 	/*
@@ -140,7 +143,7 @@ public class GameHandler : MonoBehaviour {
 		activePlayer = p2;
 		inactivePlayer = p1;
 		endMessage.enabled = false;
-		GameLog = "";
+		GameLog = "Game Log Initialized";
 
 	}
 
@@ -152,7 +155,18 @@ public class GameHandler : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//Log ("test");
+		if (debug){
+			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+			RaycastHit[] hitAll = Physics.RaycastAll(ray);
+			
+			Card hoverCard = null;
+			foreach (RaycastHit h in hitAll){
+				if (h.transform.tag == "Card"){
+					hoverCard = h.transform.GetComponent<Card>();
+					cardData = hoverCard.GetData();
+				}
+			}
+		}
 		if (gameOver){
 			if (Input.GetMouseButtonDown(0)){
 				Application.LoadLevel(Application.loadedLevel);
@@ -334,10 +348,13 @@ public class GameHandler : MonoBehaviour {
 		//scrollPosition = GUI.BeginScrollView(new Rect(Screen.width - Screen.width/3,0,Screen.width/3 -20,Screen.height-20), scrollPosition, new Rect(0,0,200,200));
 
 		//scrollPosition = 
-		GUI.BeginGroup(new Rect(Screen.width - Screen.width/3 -10, 10, Screen.width/3, 400));
+		GUI.BeginGroup(new Rect(Screen.width - Screen.width/3 -10, 10, Screen.width/3, 600));
 			if (GUI.Button(new Rect(Screen.width/3 - 100, 300, 100, 20), "Scroll Lock")){
 				scrollLock = !scrollLock;
 			}
+		if (GUI.Button(new Rect(Screen.width/3 - 100, 330, 100, 20), "Hover Debug")){
+			debug = !debug;
+		}
 		if (scrollLock) {
 			scrollPosition.y = Mathf.Infinity;
 			GUI.BeginScrollView(	new Rect(0,0, Screen.width/3, 300), 
@@ -345,13 +362,18 @@ public class GameHandler : MonoBehaviour {
 			                    	new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20) + 10));
 		}
 		else{
-			scrollPosition = GUI.BeginScrollView(	new Rect(0,0, Screen.width/3, 300), 
-		                                     		scrollPosition, 
-		                                     		new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20) + 10));
+			scrollPosition = 
+			GUI.BeginScrollView(	new Rect(0,0, Screen.width/3, 300), 
+		                       		scrollPosition, 
+		                       		new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20) + 10));
 		}
-			GUI.Box(new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20)), GameLog);
+			GUI.Box(new Rect(0, 0, Screen.width/3 - 20, guiSkin.box.CalcHeight(new GUIContent(GameLog), Screen.width/3 - 20)+5), GameLog);
 			GUI.EndScrollView();
 			
+		if (debug){
+			GUI.Box(new Rect(0, 360, Screen.width/3 - 20, 200), cardData);
+
+		}
 
 		GUI.EndGroup();
 	}

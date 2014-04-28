@@ -403,4 +403,12 @@ public class Card : MonoBehaviour {
 		strengthText.text = (this.strength == -1) ? " " : this.strength.ToString();
 		specialText.text = (this.special) ? "X" : " ";
 	}
+
+	public string GetData(){
+		string data = "";
+		data += name;
+		data += "\n";
+
+				return data;
+	}
 }
