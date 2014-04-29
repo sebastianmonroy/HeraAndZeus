@@ -713,6 +713,7 @@ public class Player : MonoBehaviour {
 		for (int i = 0; i < hand.Count; i++){
 			Card card = hand[i];
 			card.MoveTo(left + this.transform.right * (Card.width + buffer) * i, true);
+			if (card.isFlipped) Debug.Log(name + " " + card.name);
 			card.Flip(showHand);
 		}
 	}

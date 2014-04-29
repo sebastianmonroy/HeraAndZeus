@@ -19,6 +19,11 @@ public class Bot : Player {
 	
 	// Update is called once per frame
 	new void Update () {
+		if (Input.GetKeyDown(KeyCode.H)){
+			Debug.Log("H");
+			Shuffle(hand);
+			ArrangeHand();
+		}
 		base.Update();
 		if (delay >= 0)	delay -= Time.deltaTime;
 		else delay = 0;
@@ -29,7 +34,7 @@ public class Bot : Player {
 			ExecuteMove(PickMove());
 			Shuffle(hand);
 			ArrangeHand();
-			delay = 1;
+			delay = 2;
 		}
 	}
 	
@@ -150,7 +155,9 @@ public class Bot : Player {
 				if (discardPile.Contains(m.hadesCard)){
 					discardPile.Remove(m.hadesCard);
 					hand.Add(m.hadesCard);
-					hand.Remove(m.playCard);
+					m.hadesCard.Flip(showHand);
+					m.hadesCard.Reveal(false);
+					Discard(m.playCard);
 					ArrangeHand();
 					GameHandler.Log(name + " uses HADES to reclaim " + m.hadesCard.name);
 					actionPoints --;
@@ -170,15 +177,11 @@ public class Bot : Player {
 
 				while(index < discardPile.Count && numPeg < 3){
 					if (discardPile[index].type == CardType.PEGASUS){
-					//	Debug.Log("found a pegasus");
 						Card peg = discardPile[index];
-					//	Debug.Log("here");
-
 						hand.Add(peg);
-					//	Debug.Log("added pegasus to hand");
-
 						discardPile.Remove(peg);
 						numPeg ++;
+						Debug.Log(numPeg);
 					}
 					else
 						index++;
