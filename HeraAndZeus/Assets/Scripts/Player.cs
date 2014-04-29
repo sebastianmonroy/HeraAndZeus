@@ -19,12 +19,12 @@ public class Player : MonoBehaviour {
 	public int actionPoints;
 
 	private CardType[] deck;
-	private Card[] allCards;
 	public CardType[] forceDeck;
 
 	public List<Card> hand;
 	public List<Card> drawPile;
 	public List<Card> discardPile;
+	public List<Card> allCards;
 
 	public FieldSpot[,] playField;
 
@@ -228,14 +228,19 @@ public class Player : MonoBehaviour {
 				Card chosen = hit.transform.GetComponent<Card>();
 				if (selectedCard.type == CardType.HADES) {
 					if (chosen == heldCard) {
-						//Debug.Log("hades choose");
-						discardPile.Remove(chosen);
+						Debug.Log("hades choose");
+						chosen.owner.discardPile.Remove(chosen);
+						chosen.owner = this;
+						hand.Add(chosen);
+
+						chosen.oldProbabilityVector = selectedCard.probabilityVector;
 						chosen.Reveal(false);
 						chosen.HoldUp(false);
+
 						heldCard = null;
-						hand.Add(chosen);
 						Discard(selectedCard);
 						SelectCard(null);
+
 						actionPoints--;
 						discardIndex = 0;
 						phase = MythPhase.NONE;
@@ -277,12 +282,18 @@ public class Player : MonoBehaviour {
 					if (chosen == heldCard) {
 						Debug.Log("sirens choose");						
 						chosen.owner.discardPile.Remove(chosen);
+						chosen.owner = this;
+						hand.Add(chosen);
+
+						allCards.Add(chosen);
+						chosen.oldProbabilityVector = selectedCard.probabilityVector;
 						chosen.Reveal(false);
 						chosen.HoldUp(false);
+
 						heldCard = null;
 						Discard(selectedCard);
-						hand.Add(chosen);
 						SelectCard(null);
+
 						actionPoints--;
 						discardIndex = 0;
 						phase = MythPhase.NONE;
@@ -295,7 +306,6 @@ public class Player : MonoBehaviour {
 						if (discardIndex >= chosen.owner.discardPile.Count) {
 							discardIndex = 0;
 						}
-						//Debug.Log("hades scroll " + discardIndex);
 
 						chosen = chosen.owner.discardPile[chosen.owner.discardPile.Count-1-discardIndex];
 						chosen.HoldUp(true);
@@ -414,6 +424,9 @@ public class Player : MonoBehaviour {
 								Discard(selectedCard);
 								SelectCard(null);
 								chosen = null;
+								foreach (Card p in pegs){
+									discardPile.Remove(p);
+								}
 								hand.AddRange(pegs);
 								ArrangeHand();
 							} else if (selectedCard.type == CardType.HADES && discardPile.Contains(chosen)) {
@@ -467,7 +480,7 @@ public class Player : MonoBehaviour {
 					}
 				}
 			} else if (scrollDown) {
-				if (raycast && heldCard != null && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard.isPickedUp) {
+				if (heldCard != null && heldCard.isPickedUp) {
 					// put down held card if it is already picked up
 					heldCard.HoldUp(false);
 					heldCard = null;
@@ -583,13 +596,13 @@ public class Player : MonoBehaviour {
 				actionPoints --;
 			}
 
-			card.updatePredictionVector(CardType.DIONYSUS, -2);
-			card.updatePredictionVector(CardType.HADES, -1);
-			card.updatePredictionVector(CardType.PERSEPHONE, -1);
-			card.updatePredictionVector(CardType.SIRENS, -1);
-			if (spot.row != 0) {
-				card.updatePredictionVector(CardType.ZEUS, -1);
-			}
+			// card.isNotCardType(CardType.DIONYSUS);
+			// card.isNotCardType(CardType.HADES);
+			// card.isNotCardType(CardType.PERSEPHONE);
+			// card.isNotCardType(CardType.SIRENS);
+			// if (spot.row != 0) {
+			// 	card.isNotCardType(CardType.ZEUS);
+			// }
 			return true;
 		} else {
 			return false;
@@ -620,22 +633,22 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	private Card[] BuildDrawPile() {
-		List<CardType> allCardsList = new List<CardType>();
-		allCardsList.AddRange(deck);
+	private List<Card> BuildDrawPile() {
+		List<CardType> allCardTypes = new List<CardType>();
+		allCardTypes.AddRange(deck);
 
 		foreach (CardType type in deck){
 			Card c = GameObject.Instantiate(cardPrefab, drawPilePos, Quaternion.identity) as Card;
 			c.SetType(type);
 			c.SetFlip(false);
 			c.owner = this;
-			c.setupPredictionVector(allCardsList);
-			//c.predictList = allCardsList;
-			c.setupPredictionVector(allCardsList);
+			c.setupPredictionVector(allCardTypes);
+			//c.predictList = allCardTypes;
+			c.setupPredictionVector(allCardTypes);
 			drawPile.Add(c);
 		}
 
-		return drawPile.ToArray();
+		return drawPile;
 	}
 
 	private CardType[] BuildDeck() {
@@ -790,11 +803,11 @@ public class Player : MonoBehaviour {
 		return false;
 	}
 
-	public void updateAllCardPredictions(CardType ct, int amount) {
-		foreach (Card card in allCards) {
-			card.updatePredictionVector(ct, amount);
-		}
-	}
+	// public void updateAllCardPredictions(CardType ct, int amount) {
+	// 	foreach (Card card in allCards) {
+	// 		card.updatePredictionVector(ct, amount);
+	// 	}
+	// }
 
 	public void ArrangeDiscard(){
 		foreach(Card c in discardPile){

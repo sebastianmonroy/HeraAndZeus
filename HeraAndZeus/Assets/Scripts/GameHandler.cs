@@ -143,7 +143,7 @@ public class GameHandler : MonoBehaviour {
 		activePlayer = p2;
 		inactivePlayer = p1;
 		endMessage.enabled = false;
-		GameLog = "Game Log Initialized";
+		GameLog = "Bot Log Initialized";
 
 	}
 
@@ -356,7 +356,7 @@ public class GameHandler : MonoBehaviour {
 		//scrollPosition = GUI.BeginScrollView(new Rect(Screen.width - Screen.width/3,0,Screen.width/3 -20,Screen.height-20), scrollPosition, new Rect(0,0,200,200));
 
 		//scrollPosition = 
-		GUI.BeginGroup(new Rect(Screen.width - Screen.width/3 -10, 10, Screen.width/3, 600));
+		GUI.BeginGroup(new Rect(Screen.width - Screen.width/3 -10, 10, Screen.width/3, Screen.height));
 			if (GUI.Button(new Rect(Screen.width/3 - 100, 300, 100, 20), "Scroll Lock")){
 				scrollLock = !scrollLock;
 			}
@@ -379,7 +379,7 @@ public class GameHandler : MonoBehaviour {
 			GUI.EndScrollView();
 			
 		if (debug){
-			GUI.Box(new Rect(0, 360, Screen.width/3 - 20, 200), cardData);
+			GUI.Box(new Rect(0, 360, Screen.width/3 - 20, 300), cardData);
 
 		}
 

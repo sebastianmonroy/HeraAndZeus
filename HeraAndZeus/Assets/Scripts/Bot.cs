@@ -82,7 +82,7 @@ public class Bot : Player {
 		foreach(Move m in posMoves){
 			//Debug.Log(m.ToString());
 			if (m.type == MoveType.MYTH){
-				Debug.Log(m.ToString());
+//				Debug.Log(m.ToString());
 				//return m;
 			}
 		}
@@ -149,6 +149,7 @@ public class Bot : Player {
 				if (discardPile.Contains(m.hadesCard)){
 					discardPile.Remove(m.hadesCard);
 					hand.Add(m.hadesCard);
+					ArrangeHand();
 					GameHandler.Log(name + " uses HADES to reclaim " + m.hadesCard.name);
 					actionPoints --;
 				}
@@ -163,10 +164,18 @@ public class Bot : Player {
 			case CardType.PERSEPHONE: //COMPLETE
 				int numPeg = 0;
 				int index = 0;
+				//Debug.Log("here2");
+
 				while(index < discardPile.Count && numPeg < 3){
 					if (discardPile[index].type == CardType.PEGASUS){
-						hand.Add(discardPile[index]);
-						discardPile.Remove(discardPile[index]);
+					//	Debug.Log("found a pegasus");
+						Card peg = discardPile[index];
+					//	Debug.Log("here");
+
+						hand.Add(peg);
+					//	Debug.Log("added pegasus to hand");
+
+						discardPile.Remove(peg);
 						numPeg ++;
 					}
 					else
@@ -200,8 +209,9 @@ public class Bot : Player {
 				break;
 			}
 			break;
-			GameHandler.Log(name + " plays " + m.playCard.name);
+			//GameHandler.Log(name + " plays " + m.playCard.name);
 		}
+		GameHandler.Log(name + " Action Points: " + actionPoints);
 	}
 	
 }
