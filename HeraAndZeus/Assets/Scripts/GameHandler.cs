@@ -155,6 +155,9 @@ public class GameHandler : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Input.GetKeyDown(KeyCode.Space)){
+			Application.LoadLevel(Application.loadedLevel);
+		}
 		if (debug){
 			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			RaycastHit[] hitAll = Physics.RaycastAll(ray);

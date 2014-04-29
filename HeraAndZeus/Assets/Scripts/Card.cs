@@ -12,7 +12,7 @@ public enum CardType {
 }
 
 public class Card : MonoBehaviour {
-	public static float width = 10;
+	public static float width = 8;
 	public static float height = 8;
 
 	public CardType type;
@@ -305,6 +305,8 @@ public class Card : MonoBehaviour {
 		this.type = cardType;
 		this.name = type.ToString();
 		this.title = type.ToString();
+		if (this.title == "PERSEPHONE") this.title = "PERSEPH";
+
 		switch(type) {
 			/*
 			case CardType.HERA:
