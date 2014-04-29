@@ -53,6 +53,7 @@ public class GameState{
 	Card[] otherHand;
 	Card[] myDrawPile;
 	Card[] myDiscardPile;
+	Card[] otherDrawPile;
 
 	
 	public void Build(Player p1, Player p2){
@@ -70,7 +71,7 @@ public class GameState{
 		myHand = p1.hand.ToArray();
 		myDrawPile = p1.drawPile.ToArray();
 		myDiscardPile = p1.discardPile.ToArray();
-
+		otherDrawPile = p2.drawPile.ToArray();
 	}
 
 	public void Build(GameState original){
@@ -80,6 +81,7 @@ public class GameState{
 		otherHand = (Card[])original.otherHand.Clone();
 		myDrawPile = (Card[])original.myDrawPile.Clone();
 		myDiscardPile = (Card[])original.myDiscardPile.Clone();
+		otherDrawPile = (Card[])original.otherDrawPile.Clone();
 	}
 
 	public float Eval(){
@@ -96,7 +98,69 @@ public class GameState{
 			}
 			break;
 		case MoveType.PLAY: 
-			moveVal = 1;
+			//IF THE TARGET OF THE PLAY IS THE FIRST ROW, TREAT IT LIKE A CHALLENGE
+			if (move.targetSpot.row == 0 && otherField[0, 2- move.targetSpot.col].card != null){
+				Card otherCard = otherField[0, 2- move.targetSpot.col].card;
+				//IF THE OPPONENTS FIRST ROW CARD IS KNOWN
+				if (otherCard.revealed){
+					float challengeVal = 0;
+
+					int context = 0;
+					
+					int result = GameHandler.challengeTable[context, (int)move.playCard.type, (int)otherCard.type];
+					
+					switch(result){
+					case(0):
+						challengeVal +=0;
+						break;
+					case(1):
+						challengeVal += Card.subjectiveValues[(int)otherCard.type];
+						break;
+					case(2):
+						challengeVal -= Card.subjectiveValues[(int)move.playCard.type];
+						break;
+					case(3):
+						challengeVal += Card.subjectiveValues[(int)otherCard.type];
+						challengeVal -= Card.subjectiveValues[(int)move.playCard.type];
+						break;
+					default:
+						break;
+					}
+
+					moveVal += challengeVal;
+				}
+				//IF THE OPPONENTS FIRST ROW CARD IS NOT KNOWN
+				else{
+					float[] probs = otherField[0, 2- move.targetSpot.col].card.getPredictionProbabilities();
+					for (int i = 0; i< probs.Length; i++){
+						float challengeVal = 0;
+						int context = 0;
+
+						int result = GameHandler.challengeTable[context, (int)move.playCard.type, i];
+						
+						switch(result){
+						case(0):
+							challengeVal +=0;
+							break;
+						case(1):
+							challengeVal += Card.subjectiveValues[i];
+							break;
+						case(2):
+							challengeVal -= Card.subjectiveValues[(int)move.playCard.type];
+							break;
+						case(3):
+							challengeVal += Card.subjectiveValues[i];
+							challengeVal -= Card.subjectiveValues[(int)move.playCard.type];
+							break;
+						default:
+							break;
+						}
+						moveVal += probs[i] * challengeVal;
+					}
+				}
+			}
+			else moveVal = 1;
+
 			break;
 		case MoveType.CHALLENGE:
 			float[] probs = move.defender.getPredictionProbabilities();
@@ -136,7 +200,31 @@ public class GameState{
 
 			break;
 		case MoveType.MYTH:
-			moveVal = 1;
+			switch(move.playCard.type){
+			case CardType.HADES: 
+				moveVal = Card.subjectiveValues[(int)move.hadesCard.type];
+				break;
+			case CardType.DIONYSUS:
+				//CALCULATE LIKE PLAY
+				moveVal = 3;
+				break;
+			case CardType.PERSEPHONE:
+				int numPeg = 0;
+				foreach(Card c in myDiscardPile){
+					if (c.type ==  CardType.PEGASUS){
+						numPeg++;
+					}
+				}
+				if (numPeg > 3) numPeg = 3;
+				moveVal = numPeg * Card.subjectiveValues[(int)CardType.PEGASUS];
+				break;
+			case CardType.PYTHIA:
+				moveVal = 6;
+				break;
+			case CardType.SIRENS: 
+				moveVal = Card.subjectiveValues[(int) otherDrawPile[otherDrawPile.Length-1].type];
+				break;
+			}
 			break;
 		}
 

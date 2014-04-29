@@ -12,7 +12,7 @@ public enum CardType {
 }
 
 public class Card : MonoBehaviour {
-	public static float[] subjectiveValues = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+	public static float[] subjectiveValues = {8,9,2,7,6,5,4,3,1,1,6,0,1,0,5,0};
 
 	public static float width = 8;
 	public static float height = 8;

@@ -88,6 +88,8 @@ public class Bot : Player {
 		float bestVal = 0;
 		foreach(Move m in posMoves){
 			float moveVal = state.EvaluateMove(m);
+			Debug.Log(m.ToString() + "\nValue: " + moveVal);
+
 			if (moveVal > bestVal){
 				bestVal = moveVal;
 					bestMove = m;
