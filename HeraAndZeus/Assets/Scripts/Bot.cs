@@ -65,7 +65,6 @@ public class Bot : Player {
 					sortedHand.Insert(index, c);
 				}
 			}
-
 		}
 
 		Play(sortedHand[0], playField[0,0]);
@@ -79,15 +78,17 @@ public class Bot : Player {
 	Move PickMove(){
 		GameState state = GameHandler.Instance.GetState();
 		List<Move> posMoves = state.GetMoves();
+		Shuffle(posMoves);
+		Move bestMove = posMoves[0];
+		float bestVal = 0;
 		foreach(Move m in posMoves){
-			//Debug.Log(m.ToString());
-			if (m.type == MoveType.MYTH){
-//				Debug.Log(m.ToString());
-				//return m;
+			float moveVal = state.EvaluateMove(m);
+			if (moveVal > bestVal){
+				bestVal = moveVal;
+					bestMove = m;
 			}
 		}
-		//Debug.Log("No Myth Moves available");
-		return posMoves[Random.Range(0,posMoves.Count)];
+		return bestMove;
 
 	}
 
@@ -149,6 +150,7 @@ public class Bot : Player {
 				if (discardPile.Contains(m.hadesCard)){
 					discardPile.Remove(m.hadesCard);
 					hand.Add(m.hadesCard);
+					hand.Remove(m.playCard);
 					ArrangeHand();
 					GameHandler.Log(name + " uses HADES to reclaim " + m.hadesCard.name);
 					actionPoints --;

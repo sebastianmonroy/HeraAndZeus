@@ -612,12 +612,12 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public static void Shuffle(List<Card> cards){
+	public static void Shuffle<T>(List<T> cards){
 		int n = cards.Count;
 		while (n > 1) {
 			int k = (Random.Range(0, n) % n);
 			n--;
-			Card value = cards[k];
+			T value = cards[k];
 			cards[k] = cards[n];
 			cards[n] = value;
 		}

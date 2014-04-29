@@ -12,6 +12,8 @@ public enum CardType {
 }
 
 public class Card : MonoBehaviour {
+	public static float[] subjectiveValues = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+
 	public static float width = 8;
 	public static float height = 8;
 
@@ -35,6 +37,8 @@ public class Card : MonoBehaviour {
 	Vector3 moveDestination;
 	Vector3 pickDestination;
 	public bool showText = false;
+
+	public float subValue;
 
 	public bool revealed = false;
 
@@ -412,6 +416,8 @@ public class Card : MonoBehaviour {
 				this.special = false;
 				break;
 		}
+
+		subValue = strength;
 
 		titleText.text = this.title;
 		strengthText.text = (this.strength == -1) ? " " : this.strength.ToString();

@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System;
+
 
 
 public enum MoveType{PLAY, CHALLENGE, DRAW, MYTH}
@@ -70,8 +73,74 @@ public class GameState{
 
 	}
 
+	public void Build(GameState original){
+		myField = (FieldSpot[,])original.myField.Clone();
+		otherField = (FieldSpot[,])original.otherField.Clone();
+		myHand = (Card[])original.myHand.Clone();
+		otherHand = (Card[])original.otherHand.Clone();
+		myDrawPile = (Card[])original.myDrawPile.Clone();
+		myDiscardPile = (Card[])original.myDiscardPile.Clone();
+	}
+
 	public float Eval(){
 		return 0;
+	}
+
+	public float EvaluateMove(Move move){
+		float moveVal = 0;
+		switch(move.type){
+		case MoveType.DRAW:
+			float[] drawProbs = myDrawPile[0].getPredictionProbabilities();
+			for (int i = 0; i< drawProbs.Length; i++){
+				moveVal += drawProbs[i] * Card.subjectiveValues[i];
+			}
+			break;
+		case MoveType.PLAY: 
+			moveVal = 1;
+			break;
+		case MoveType.CHALLENGE:
+			float[] probs = move.defender.getPredictionProbabilities();
+			//need the chance it being a certain card, the subvalue of that card, and the resolution of a challenge
+			//for each possible defender, represented by i i
+			for (int i = 0; i< probs.Length; i++){
+				float challengeVal = 0;
+				int context = 3;
+				if (move.attacker.spot != null && move.defender.spot != null && move.attacker.spot.col == (2 -move.defender.spot.col)) {
+					context = 0;
+				} else if (Array.IndexOf(myHand, move.attacker)>-1 &&  Array.IndexOf(otherHand, move.defender)>-1) {
+					context = 1;
+				} else if (Array.IndexOf(myHand, move.attacker)>-1 && move.defender.spot != null && move.defender.spot.row == 0) {
+					context = 2;
+				}
+				int result = GameHandler.challengeTable[context, (int)move.attacker.type, i];
+
+				switch(result){
+				case(0):
+					challengeVal +=0;
+					break;
+				case(1):
+					challengeVal += Card.subjectiveValues[i];
+					break;
+				case(2):
+					challengeVal -= Card.subjectiveValues[(int)move.attacker.type];
+					break;
+				case(3):
+					challengeVal += Card.subjectiveValues[i];
+					challengeVal -= Card.subjectiveValues[(int)move.attacker.type];
+					break;
+				default:
+					break;
+				}
+				moveVal += probs[i] * challengeVal;
+			}
+
+			break;
+		case MoveType.MYTH:
+			moveVal = 1;
+			break;
+		}
+
+		return moveVal;
 	}
 
 	public List<Move> GetMoves(){
@@ -103,7 +172,7 @@ public class GameState{
 				Move handChallenge = new Move();
 				handChallenge.type = MoveType.CHALLENGE;
 				handChallenge.attacker = c;
-				handChallenge.defender = otherHand[Random.Range(0, otherHand.Length)];
+				handChallenge.defender = otherHand[UnityEngine.Random.Range(0, otherHand.Length)];
 				possibleMoves.Add(handChallenge);
 			}
 
