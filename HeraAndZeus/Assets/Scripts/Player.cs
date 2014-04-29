@@ -414,6 +414,9 @@ public class Player : MonoBehaviour {
 								Discard(selectedCard);
 								SelectCard(null);
 								chosen = null;
+								foreach (Card p in pegs){
+									discardPile.Remove(p);
+								}
 								hand.AddRange(pegs);
 								ArrangeHand();
 							} else if (selectedCard.type == CardType.HADES && discardPile.Contains(chosen)) {

@@ -143,7 +143,7 @@ public class GameHandler : MonoBehaviour {
 		activePlayer = p2;
 		inactivePlayer = p1;
 		endMessage.enabled = false;
-		GameLog = "Game Log Initialized";
+		GameLog = "Bot Log Initialized";
 
 	}
 
