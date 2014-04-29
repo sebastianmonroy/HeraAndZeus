@@ -79,6 +79,14 @@ public class Bot : Player {
 	Move PickMove(){
 		GameState state = GameHandler.Instance.GetState();
 		List<Move> posMoves = state.GetMoves();
+		foreach(Move m in posMoves){
+			Debug.Log(m.ToString());
+			if (m.type == MoveType.MYTH){
+				Debug.Log("found a move " + m.playCard);
+				return m;
+			}
+		}
+		//Debug.Log("No Myth Moves available");
 		return posMoves[Random.Range(0,posMoves.Count)];
 
 	}
@@ -119,6 +127,8 @@ public class Bot : Player {
 				if (discardPile.Contains(m.hadesCard)){
 					discardPile.Remove(m.hadesCard);
 					hand.Add(m.hadesCard);
+					GameHandler.Log(name + " uses HADES to reclaim " + m.hadesCard.name);
+					actionPoints --;
 				}
 				break;
 			case CardType.DIONYSUS: //COMPLETE
@@ -126,10 +136,9 @@ public class Bot : Player {
 				m.dionysusCard.spot.card = null;
 				m.dionysusCard.spot = null;
 				Play (m.dionysusCard, m.targetSpot);
+				GameHandler.Log(name + " uses DIONYSUS to move " + m.dionysusCard.name);
 				break;
 			case CardType.PERSEPHONE: //COMPLETE
-				GameHandler.Log(name + " plays " + m.playCard.name);
-				Debug.Log("trying to play persephone");
 				int numPeg = 0;
 				int index = 0;
 				while(index < discardPile.Count && numPeg < 3){
@@ -143,6 +152,7 @@ public class Bot : Player {
 				}
 				Discard(m.playCard);
 				ArrangeHand();
+				GameHandler.Log(name + " plays PERSEPHONE to reclaim " + numPeg + " PEGASUS");
 				actionPoints --;
 				break;
 			case CardType.PYTHIA: //COMPLETE
