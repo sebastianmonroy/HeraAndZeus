@@ -244,14 +244,14 @@ public class Card : MonoBehaviour {
 				if (isPickedUp) {	// already picked up
 					if (picking) {		// is being put down
 						isPickedUp = false;
-						pickDestination = Camera.main.transform.position - Vector3.up * 2;
+						pickDestination = Camera.main.transform.position - Vector3.up * 3;
 						desiredScale = 5 * originalScale;
 						picking = true;
 					}
 				} else {			// not already picked up
 					if (!picking) {		// is not being picked up
 						originalPosition = this.transform.position;
-						pickDestination = Camera.main.transform.position - Vector3.up * 2;
+						pickDestination = Camera.main.transform.position - Vector3.up * 3;
 						desiredScale = 5 * originalScale;
 						picking = true;
 					}

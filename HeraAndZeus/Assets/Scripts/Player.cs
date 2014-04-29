@@ -516,6 +516,7 @@ public class Player : MonoBehaviour {
 			card.MoveTo(discardPilePos, false);
 			spot.card = null;
 			ArrangeField();
+			ArrangeDiscard();
 			return true;
 		} else if (hand.Contains(card)){
 			card.spot = null;
@@ -524,6 +525,7 @@ public class Player : MonoBehaviour {
 			card.MoveTo(discardPilePos, false);
 			hand.Remove(card);
 			ArrangeHand();
+			ArrangeDiscard();
 			return true;
 		}
 
@@ -783,5 +785,12 @@ public class Player : MonoBehaviour {
 		foreach (Card card in allCards) {
 			card.updatePredictionVector(ct, amount);
 		}
+	}
+
+	public void ArrangeDiscard(){
+		foreach(Card c in discardPile){
+			c.MoveTo(discardPilePos);
+		}
+		discardPile[discardPile.Count - 1].MoveTo(discardPilePos + Vector3.up * 3);
 	}
 }
