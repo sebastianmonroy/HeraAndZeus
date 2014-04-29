@@ -350,7 +350,7 @@ public class Player : MonoBehaviour {
 		} else if (phase == MythPhase.DIONYSUS){
 			if (overSpot != null){
 				if (overSpot.card != null && selectedCard != null && OwnsFieldSpot(overSpot)){//a card is selected and the cursor is over a field spot with a card
-					if (overSpot.card.type != CardType.ZEUS && ((selectedCard.spot.col == overSpot.col && selectedCard.spot.row != overSpot.row - 1) || selectedCard.spot.row == overSpot.row) && overSpot != selectedCard.spot) {
+					if (overSpot.card.type != CardType.ZEUS && (selectedCard.spot.col == overSpot.col || selectedCard.spot.row == overSpot.row)) {
 						MakeGap(overSpot);
 					}
 				}
@@ -359,7 +359,7 @@ public class Player : MonoBehaviour {
 			if (leftClick && heldCard == null && raycast) {
 				if (hit.transform.tag == "Spot") {
 					FieldSpot chosen = hit.transform.GetComponent<FieldSpot>();
-					if (chosen.row == selectedCard.spot.row || (chosen.col == selectedCard.spot.col)) {
+					if (chosen.row == selectedCard.spot.row || chosen.col == selectedCard.spot.col) {
 						Play(selectedCard, chosen);
 						SelectCard(null);
 						phase = MythPhase.NONE;
@@ -430,8 +430,11 @@ public class Player : MonoBehaviour {
 							if (selectedCard.type == CardType.DIONYSUS && FindOnField(chosen) != null) {
 								// selected DIONYSUS and clicked on any card in own field
 								Discard(selectedCard);
+								chosen.spot.card = null;
 								SelectCard(chosen);
+								hand.Add(chosen);
 								chosen = null;
+								ArrangeHand();
 								phase = MythPhase.DIONYSUS;
 							} else if (selectedCard.type == CardType.PERSEPHONE && discardPile.Contains(chosen) != null) {
 								actionPoints--;
@@ -572,13 +575,17 @@ public class Player : MonoBehaviour {
 			ArrangeHand();
 			ArrangeField();
 			card.Flip(false);
-			actionPoints --;
+			if (card.type != CardType.ZEUS) {
+				actionPoints --;
+			}
 
 			card.updatePredictionVector(CardType.DIONYSUS, -2);
 			card.updatePredictionVector(CardType.HADES, -1);
 			card.updatePredictionVector(CardType.PERSEPHONE, -1);
 			card.updatePredictionVector(CardType.SIRENS, -1);
-			card.updatePredictionVector(CardType.ZEUS, -1);
+			if (spot.row != 0) {
+				card.updatePredictionVector(CardType.ZEUS, -1);
+			}
 			return true;
 		} else {
 			return false;

@@ -101,6 +101,23 @@ public class Bot : Player {
 				context = 0;
 			} else if (hand.Contains(m.attacker) && m.defender.owner.hand.Contains(m.defender)) {
 				context = 1;
+				if (m.attacker.type == CardType.PEGASUS && m.defender.strength < 8 && m.defender.strength > 1) {
+					//m.type = MoveType.PEGASUS;
+					bool success = false;
+					for (int i = 0; i < 3; i++) {
+						if (m.attacker.owner.playField[4,i].card == null && (m.attacker.owner.playField[0,i].card != null && m.attacker.owner.playField[0,i].card.type != CardType.ZEUS) && !(m.defender.type == CardType.ZEUS && m.attacker.owner.playField[0,i].card == null)) {
+							m.defender.owner.Play(m.defender, m.defender.owner.playField[0,i]);
+							m.defender.owner.actionPoints++;
+							success = true;
+							break;
+						}
+					}
+
+					if (!success) {
+						m.defender.owner.Discard(m.defender);
+					}
+					break;
+				}
 			} else if (hand.Contains(m.attacker) && m.defender.spot != null && m.defender.spot.row == 0) {
 				context = 2;
 			}
