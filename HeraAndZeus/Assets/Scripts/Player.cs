@@ -190,35 +190,7 @@ public class Player : MonoBehaviour {
 		
 		ArrangeField();
 
-		if (scrollUp) {
-			if (raycast && hit.transform.tag == "Card") {
-				Card card = hit.transform.gameObject.GetComponent<Card>();
-				if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
-					if (heldCard != null && heldCard.isPickedUp) {
-						// put down currently held up card
-						heldCard.HoldUp(false);
-						
-						// hold up card
-						card.HoldUp(true);
-						heldCard = card;
-						
-						SelectCard(null);
-					} else if (heldCard == null) {
-						// hold up card
-						card.HoldUp(true);
-						heldCard = card;
-						
-						SelectCard(null);
-					}
-				}
-			}
-		} else if (scrollDown) {
-			if (raycast && heldCard != null && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard.isPickedUp) {
-				// put down held card if it is already picked up
-				heldCard.HoldUp(false);
-				heldCard = null;
-			}
-		}
+
 
 		if (phase == MythPhase.PYTHIA){
 			if (leftClick && raycast){
@@ -250,26 +222,26 @@ public class Player : MonoBehaviour {
 				}
 			}
 		} else if (phase == MythPhase.HADES){
+			scrollUp = false;
+			scrollDown = false;
 			if (leftClick && raycast) {
 				Card chosen = hit.transform.GetComponent<Card>();
 				if (selectedCard.type == CardType.HADES) {
 					if (chosen == heldCard) {
-						Debug.Log("hades choose");
+						//Debug.Log("hades choose");
 						discardPile.Remove(chosen);
 						chosen.Reveal(false);
 						chosen.HoldUp(false);
 						heldCard = null;
-						Discard(selectedCard);
 						hand.Add(chosen);
+						Discard(selectedCard);
 						SelectCard(null);
 						actionPoints--;
 						discardIndex = 0;
 						phase = MythPhase.NONE;
 						ArrangeHand();
 					} else if (discardPile.Contains(chosen)) {
-						
 						heldCard.HoldUp(false);
-
 						discardIndex++;
 						if (discardIndex >= discardPile.Count) {
 							discardIndex = 0;
@@ -433,7 +405,7 @@ public class Player : MonoBehaviour {
 								SelectCard(chosen);
 								chosen = null;
 								phase = MythPhase.DIONYSUS;
-							} else if (selectedCard.type == CardType.PERSEPHONE && discardPile.Contains(chosen) != null) {
+							} else if (selectedCard.type == CardType.PERSEPHONE && discardPile.Contains(chosen)) {
 								actionPoints--;
 								List<Card> pegs = GetPegsFromDiscard();
 								Discard(selectedCard);
@@ -441,7 +413,7 @@ public class Player : MonoBehaviour {
 								chosen = null;
 								hand.AddRange(pegs);
 								ArrangeHand();
-							} else if (selectedCard.type == CardType.HADES && discardPile.Contains(chosen) != null) {
+							} else if (selectedCard.type == CardType.HADES && discardPile.Contains(chosen)) {
 								discardIndex = 0;
 								chosen = discardPile[discardPile.Count-1-discardIndex];
 								heldCard = chosen;
@@ -467,6 +439,36 @@ public class Player : MonoBehaviour {
 			if (rightClick){
 				SelectCard(null);
 				//GameHandler.Instance.EndGame(this);
+			}
+
+			if (scrollUp) {
+				if (raycast && hit.transform.tag == "Card") {
+					Card card = hit.transform.gameObject.GetComponent<Card>();
+					if (!card.moving && !card.flipping && !card.picking && card.isFlipped) {
+						if (heldCard != null && heldCard.isPickedUp) {
+							// put down currently held up card
+							heldCard.HoldUp(false);
+							
+							// hold up card
+							card.HoldUp(true);
+							heldCard = card;
+							
+							SelectCard(null);
+						} else if (heldCard == null) {
+							// hold up card
+							card.HoldUp(true);
+							heldCard = card;
+							
+							SelectCard(null);
+						}
+					}
+				}
+			} else if (scrollDown) {
+				if (raycast && heldCard != null && hit.transform.gameObject.GetComponent<Card>() == heldCard && heldCard.isPickedUp) {
+					// put down held card if it is already picked up
+					heldCard.HoldUp(false);
+					heldCard = null;
+				}
 			}
 		}
 
