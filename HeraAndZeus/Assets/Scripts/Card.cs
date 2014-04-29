@@ -12,7 +12,7 @@ public enum CardType {
 }
 
 public class Card : MonoBehaviour {
-	public static float width = 10;
+	public static float width = 8;
 	public static float height = 8;
 
 	public CardType type;
@@ -244,14 +244,14 @@ public class Card : MonoBehaviour {
 				if (isPickedUp) {	// already picked up
 					if (picking) {		// is being put down
 						isPickedUp = false;
-						pickDestination = Camera.main.transform.position - Vector3.up * 2;
+						pickDestination = Camera.main.transform.position - Vector3.up * 3;
 						desiredScale = 5 * originalScale;
 						picking = true;
 					}
 				} else {			// not already picked up
 					if (!picking) {		// is not being picked up
 						originalPosition = this.transform.position;
-						pickDestination = Camera.main.transform.position - Vector3.up * 2;
+						pickDestination = Camera.main.transform.position - Vector3.up * 3;
 						desiredScale = 5 * originalScale;
 						picking = true;
 					}
@@ -305,6 +305,8 @@ public class Card : MonoBehaviour {
 		this.type = cardType;
 		this.name = type.ToString();
 		this.title = type.ToString();
+		if (this.title == "PERSEPHONE") this.title = "PERSEPH";
+
 		switch(type) {
 			/*
 			case CardType.HERA:

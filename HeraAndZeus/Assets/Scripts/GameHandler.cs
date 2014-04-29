@@ -155,6 +155,9 @@ public class GameHandler : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Input.GetKeyDown(KeyCode.Space)){
+			Application.LoadLevel(Application.loadedLevel);
+		}
 		if (debug){
 			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			RaycastHit[] hitAll = Physics.RaycastAll(ray);
@@ -268,11 +271,13 @@ public class GameHandler : MonoBehaviour {
 			Debug.Log("Special Case: Pandora is Challenged");
 			//if pandora is on the field, discard all from that column
 			if (inactivePlayer.FindOnField(defender)){
-				for (int i = 0; i < 4; i++) {
-					if (inactivePlayer.playField[i,defender.spot.col].card != null)
-						inactivePlayer.Discard(inactivePlayer.playField[i,defender.spot.col].card);
-					if (activePlayer.playField[i,2-defender.spot.col].card != null)
-						activePlayer.Discard(activePlayer.playField[i,2-defender.spot.col].card);
+				int defCol = defender.spot.col;
+
+				while (inactivePlayer.playField[0,defCol].card != null){
+					inactivePlayer.Discard(inactivePlayer.playField[0,defCol].card);
+				}
+				while (activePlayer.playField[0,2-defCol].card != null){
+					activePlayer.Discard(activePlayer.playField[0,2-defCol].card);
 				}
 			}
 			
