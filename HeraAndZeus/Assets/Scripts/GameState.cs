@@ -14,6 +14,32 @@ public struct Move{
 	public Card attacker;
 	public Card defender;
 
+	public override string ToString()
+	{
+		if (type == MoveType.DRAW){
+			return ("TYPE: " + type);
+		}
+		else if (type == MoveType.PLAY){
+			return ("TYPE: " + type + 
+			        "\nplayCard: " + playCard +
+			        "\ntargetSpot: " + targetSpot);
+		}
+		else if (type ==  MoveType.CHALLENGE){
+			return ("TYPE: " + type + 
+					"\nAttacker " + attacker +
+		      	  	"\nDefender " + defender);
+		}
+		else if (type ==  MoveType.MYTH){
+			return ("TYPE: " + type + 
+			        "\nplayCard: " + playCard +
+			        "\nDionysusCard " + dionysusCard +
+			        "\nHadesCard" + hadesCard);
+
+		}
+		return ("TYPE: " + type);
+
+	}
+
 }
 
 
@@ -118,12 +144,14 @@ public class GameState{
 				}
 			}
 
-			if (c.type == CardType.PERSEPHONE || c.type == CardType.PYTHIA){
+
+			if (c.type == CardType.PERSEPHONE){
 				Move myth = new Move();
 				myth.type = MoveType.MYTH;
 				myth.playCard = c;
 				possibleMoves.Add(myth);
 			}
+
 		}
 
 
