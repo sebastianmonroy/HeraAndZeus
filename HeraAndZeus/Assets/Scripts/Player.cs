@@ -382,7 +382,7 @@ public class Player : MonoBehaviour {
 								context = 2;
 							}
 
-							Debug.Log("context " + context);
+//							Debug.Log("context " + context);
 
 							if (context != 3) {
 								int resolution = GameHandler.Instance.Challenge(context, selectedCard, chosen);

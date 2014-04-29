@@ -144,14 +144,14 @@ public class GameState{
 				}
 			}
 
-			/*
-			if (c.type == CardType.PERSEPHONE || c.type == CardType.PYTHIA){
+
+			if (c.type == CardType.PERSEPHONE){
 				Move myth = new Move();
 				myth.type = MoveType.MYTH;
 				myth.playCard = c;
 				possibleMoves.Add(myth);
 			}
-			*/
+
 		}
 
 

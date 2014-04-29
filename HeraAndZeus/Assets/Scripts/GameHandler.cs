@@ -256,7 +256,7 @@ public class GameHandler : MonoBehaviour {
 				inactivePlayer.Discard(target);
 				activePlayer.Discard(attacker);
 			}
-		} else if (attacker.type == CardType.PYTHIA && (context == 0 || context == 2)) {
+		} else if (attacker.type == CardType.PYTHIA &&  context == 2) {
 			Debug.Log("Special Case: Pythia reveals opponent's row");
 			if (inactivePlayer.FindOnField(defender) != null) {
 				for (int i = 0; i < 4; i++) {

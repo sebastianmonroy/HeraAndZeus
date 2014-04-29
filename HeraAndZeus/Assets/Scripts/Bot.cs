@@ -80,10 +80,10 @@ public class Bot : Player {
 		GameState state = GameHandler.Instance.GetState();
 		List<Move> posMoves = state.GetMoves();
 		foreach(Move m in posMoves){
-			Debug.Log(m.ToString());
+			//Debug.Log(m.ToString());
 			if (m.type == MoveType.MYTH){
-				Debug.Log("found a move " + m.playCard);
-				return m;
+				Debug.Log(m.ToString());
+				//return m;
 			}
 		}
 		//Debug.Log("No Myth Moves available");
