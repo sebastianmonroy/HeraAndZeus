@@ -89,7 +89,7 @@ public class Bot : Player {
 	Move PickMove(){
 		GameState state = GameHandler.Instance.GetState();
 		List<Move> posMoves = state.GetMoves();
-		`Shuffle(posMoves);
+		Shuffle(posMoves);
 		Move bestMove = posMoves[0];
 		float bestVal = 0;
 		foreach(Move m in posMoves){

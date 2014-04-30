@@ -89,6 +89,7 @@ public class GameState{
 	}
 
 	public float EvaluateMove(Move move){
+		int context = 3;
 		float moveVal = 0;
 		switch(move.type){
 		case MoveType.DRAW:
@@ -109,7 +110,7 @@ public class GameState{
 				if (otherCard.revealed){
 					float challengeVal = 0;
 
-					int context = 0;
+					context = 0;
 
 					int result = 0;
 					if (move.playCard.type == CardType.MEDUSA)
@@ -143,7 +144,7 @@ public class GameState{
 					float[] probs = otherCard.getPredictionProbabilities();
 					for (int i = 0; i< probs.Length; i++){
 						float challengeVal = 0;
-						int context = 0;
+						context = 0;
 
 						int result = 0;
 						if (move.playCard.type == CardType.MEDUSA)
@@ -176,9 +177,15 @@ public class GameState{
 			}
 			else moveVal = 1;
 
+			if (myField[0,move.targetSpot.col].card == null){//this col's row 1 is empty
+				moveVal += 2;
+			}
+			if (myField[1,move.targetSpot.col].card == null){//this col's row 2 is empty
+				moveVal += 2;
+			}
 			break;
 		case MoveType.CHALLENGE:
-			int context = 3;
+			context = 3;
 			if (move.attacker.spot != null && move.defender.spot != null && move.attacker.spot.col == (2 -move.defender.spot.col)) {
 				context = 0;
 			} else if (Array.IndexOf(myHand, move.attacker)>-1 &&  Array.IndexOf(otherHand, move.defender)>-1) {
@@ -260,7 +267,7 @@ public class GameState{
 						if (otherField[i,move.defender.spot.col].card != null)
 							total++;
 					}
-					moveVal = total * 2;
+					moveVal = total * 2.5f;
 				}
 			}
 
@@ -273,8 +280,79 @@ public class GameState{
 				moveVal = Card.subjectiveValues[(int)move.hadesCard.type];
 				break;
 			case CardType.DIONYSUS:
-				//CALCULATE LIKE PLAY
-				moveVal = 3;
+				//IF THE TARGET OF THE PLAY IS THE FIRST ROW, TREAT IT LIKE A CHALLENGE
+				if (move.targetSpot.row == 0 && otherField[0, 2- move.targetSpot.col].card != null){
+					Card otherCard = otherField[0, 2- move.targetSpot.col].card;
+					//IF THE OPPONENTS FIRST ROW CARD IS KNOWN
+					if (otherCard.revealed){
+						float challengeVal = 0;
+						
+						context = 0;
+						
+						int result = 0;
+						if (move.dionysusCard.type == CardType.MEDUSA)
+							result = GameHandler.challengeTable[context, (int)otherCard.type, (int)move.dionysusCard.type];
+						else
+							result = GameHandler.challengeTable[context, (int)move.dionysusCard.type, (int)otherCard.type];
+						
+						switch(result){
+						case(0):
+							challengeVal +=0;
+							break;
+						case(1):
+							challengeVal += Card.subjectiveValues[(int)otherCard.type];
+							break;
+						case(2):
+							challengeVal -= Card.subjectiveValues[(int)move.dionysusCard.type];
+							break;
+						case(3):
+							challengeVal += Card.subjectiveValues[(int)otherCard.type];
+							challengeVal -= Card.subjectiveValues[(int)move.dionysusCard.type];
+							break;
+						default:
+							break;
+						}
+						if (move.dionysusCard.type == CardType.MEDUSA) challengeVal = -challengeVal;
+						
+						moveVal += challengeVal;
+					}
+					//IF THE OPPONENTS FIRST ROW CARD IS NOT KNOWN
+					else{
+						float[] probs = otherCard.getPredictionProbabilities();
+						for (int i = 0; i< probs.Length; i++){
+							float challengeVal = 0;
+							context = 0;
+							
+							int result = 0;
+							if (move.dionysusCard.type == CardType.MEDUSA)
+								result = GameHandler.challengeTable[context, i, (int)move.dionysusCard.type];
+							else
+								result = GameHandler.challengeTable[context, (int)move.dionysusCard.type, i];
+							
+							switch(result){
+							case(0):
+								challengeVal +=0;
+								break;
+							case(1):
+								challengeVal += Card.subjectiveValues[i];
+								break;
+							case(2):
+								challengeVal -= Card.subjectiveValues[(int)move.dionysusCard.type];
+								break;
+							case(3):
+								challengeVal += Card.subjectiveValues[i];
+								challengeVal -= Card.subjectiveValues[(int)move.dionysusCard.type];
+								break;
+							default:
+								break;
+							}
+							if (move.dionysusCard.type == CardType.MEDUSA) challengeVal = -challengeVal;
+							
+							moveVal += probs[i] * challengeVal;
+						}
+					}
+				}
+				else moveVal = 2;
 				break;
 			case CardType.PERSEPHONE:
 				int numPeg = 0;
@@ -364,12 +442,14 @@ public class GameState{
 				foreach (FieldSpot spot1 in myField){
 					if (spot1.card != null){
 						foreach(FieldSpot spot2 in myField){
-							Move dionysus = new Move();
-							dionysus.type = MoveType.MYTH;
-							dionysus.playCard = c;
-							dionysus.dionysusCard = spot1.card;
-							dionysus.targetSpot = spot2;
-							possibleMoves.Add(dionysus);
+							if (spot1.row == spot2.row || spot1.col == spot2.col){
+								Move dionysus = new Move();
+								dionysus.type = MoveType.MYTH;
+								dionysus.playCard = c;
+								dionysus.dionysusCard = spot1.card;
+								dionysus.targetSpot = spot2;
+								possibleMoves.Add(dionysus);
+							}
 						}
 					}
 				}

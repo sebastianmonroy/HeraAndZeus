@@ -79,6 +79,22 @@ public class Player : MonoBehaviour {
 		for (int i = 0; i < 9; i++){
 			Draw ();
 		}
+		Card argus = new Card();
+		bool argFound = false;
+		foreach(Card c in hand){
+			if (c.type == CardType.ARGUS){
+				argFound = true;
+				argus = c;
+			}
+		}
+		if (argFound){
+			hand.Remove(argus);
+			drawPile.Add(argus);
+			argus.MoveTo(drawPilePos);
+			argus.SetFlip(false);
+			Shuffle(drawPile);
+			Draw();
+		}
 
 		actionPoints = 3;
 
@@ -92,6 +108,8 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	protected void Update () {
 		actionPointText.text = actionPoints.ToString();
+		if (actionPoints <= 0) actionPointText.renderer.enabled = false;
+		else actionPointText.renderer.enabled = true;
 	}
 
 	public virtual void SetupField(){
