@@ -11,6 +11,8 @@ using MicrosoftResearch.Infer.Distributions;
 public class Bot : Player {
 	GameState curState;
 	float delay;
+
+	public bool waitForClick;
 	// Use this for initialization
 	new void Start () {
 		base.Start();
@@ -30,7 +32,14 @@ public class Bot : Player {
 	}
 
 	public override void CheckInput(){
-		if (delay == 0){
+		if (waitForClick ){
+			if (Input.GetMouseButtonDown(0)){
+				ExecuteMove(PickMove());
+				Shuffle(hand);
+				ArrangeHand();
+			}
+		}
+		else if (delay == 0){
 			ExecuteMove(PickMove());
 			Shuffle(hand);
 			ArrangeHand();
@@ -83,7 +92,7 @@ public class Bot : Player {
 	Move PickMove(){
 		GameState state = GameHandler.Instance.GetState();
 		List<Move> posMoves = state.GetMoves();
-		Shuffle(posMoves);
+		//Shuffle(posMoves);
 		Move bestMove = posMoves[0];
 		float bestVal = 0;
 		foreach(Move m in posMoves){
@@ -100,6 +109,7 @@ public class Bot : Player {
 	}
 
 	void ExecuteMove(Move m){
+		Debug.Log("Execute Move ------------------------");
 		switch(m.type){
 		case MoveType.DRAW: //COMPLETE
 			Draw ();
@@ -180,6 +190,7 @@ public class Bot : Player {
 				while(index < discardPile.Count && numPeg < 3){
 					if (discardPile[index].type == CardType.PEGASUS){
 						Card peg = discardPile[index];
+						peg.Reveal (false);
 						hand.Add(peg);
 						discardPile.Remove(peg);
 						numPeg ++;
@@ -212,6 +223,7 @@ public class Bot : Player {
 					hand.Add(taken);
 					GameHandler.Log(name + " plays " + m.playCard.name + " and takes " + taken.name);
 					actionPoints --;
+					Discard(m.playCard);
 				}
 				break;
 			}

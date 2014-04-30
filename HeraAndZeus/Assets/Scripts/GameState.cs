@@ -92,9 +92,13 @@ public class GameState{
 		float moveVal = 0;
 		switch(move.type){
 		case MoveType.DRAW:
-			float[] drawProbs = myDrawPile[0].getPredictionProbabilities();
-			for (int i = 0; i< drawProbs.Length; i++){
-				moveVal += drawProbs[i] * Card.subjectiveValues[i];
+			if (myHand.Length > 5) 
+				moveVal = 0;
+			else{
+				float[] drawProbs = myDrawPile[0].getPredictionProbabilities();
+				for (int i = 0; i< drawProbs.Length; i++){
+					moveVal += drawProbs[i] * Card.subjectiveValues[i];
+				}
 			}
 			break;
 		case MoveType.PLAY: 
@@ -106,8 +110,12 @@ public class GameState{
 					float challengeVal = 0;
 
 					int context = 0;
-					
-					int result = GameHandler.challengeTable[context, (int)move.playCard.type, (int)otherCard.type];
+
+					int result = 0;
+					if (move.playCard.type == CardType.MEDUSA)
+						result = GameHandler.challengeTable[context, (int)otherCard.type, (int)move.playCard.type];
+					else
+						result = GameHandler.challengeTable[context, (int)move.playCard.type, (int)otherCard.type];
 					
 					switch(result){
 					case(0):
@@ -126,17 +134,22 @@ public class GameState{
 					default:
 						break;
 					}
+					if (move.playCard.type == CardType.MEDUSA) challengeVal = -challengeVal;
 
 					moveVal += challengeVal;
 				}
 				//IF THE OPPONENTS FIRST ROW CARD IS NOT KNOWN
 				else{
-					float[] probs = otherField[0, 2- move.targetSpot.col].card.getPredictionProbabilities();
+					float[] probs = otherCard.getPredictionProbabilities();
 					for (int i = 0; i< probs.Length; i++){
 						float challengeVal = 0;
 						int context = 0;
 
-						int result = GameHandler.challengeTable[context, (int)move.playCard.type, i];
+						int result = 0;
+						if (move.playCard.type == CardType.MEDUSA)
+							result = GameHandler.challengeTable[context, i, (int)move.playCard.type];
+						else
+							result = GameHandler.challengeTable[context, (int)move.playCard.type, i];
 						
 						switch(result){
 						case(0):
@@ -155,6 +168,8 @@ public class GameState{
 						default:
 							break;
 						}
+						if (move.playCard.type == CardType.MEDUSA) challengeVal = -challengeVal;
+
 						moveVal += probs[i] * challengeVal;
 					}
 				}
@@ -163,40 +178,93 @@ public class GameState{
 
 			break;
 		case MoveType.CHALLENGE:
-			float[] probs = move.defender.getPredictionProbabilities();
-			//need the chance it being a certain card, the subvalue of that card, and the resolution of a challenge
-			//for each possible defender, represented by i i
-			for (int i = 0; i< probs.Length; i++){
-				float challengeVal = 0;
-				int context = 3;
-				if (move.attacker.spot != null && move.defender.spot != null && move.attacker.spot.col == (2 -move.defender.spot.col)) {
-					context = 0;
-				} else if (Array.IndexOf(myHand, move.attacker)>-1 &&  Array.IndexOf(otherHand, move.defender)>-1) {
-					context = 1;
-				} else if (Array.IndexOf(myHand, move.attacker)>-1 && move.defender.spot != null && move.defender.spot.row == 0) {
-					context = 2;
-				}
-				int result = GameHandler.challengeTable[context, (int)move.attacker.type, i];
+			int context = 3;
+			if (move.attacker.spot != null && move.defender.spot != null && move.attacker.spot.col == (2 -move.defender.spot.col)) {
+				context = 0;
+			} else if (Array.IndexOf(myHand, move.attacker)>-1 &&  Array.IndexOf(otherHand, move.defender)>-1) {
+				context = 1;
+			} else if (Array.IndexOf(myHand, move.attacker)>-1 && move.defender.spot != null && move.defender.spot.row == 0) {
+				context = 2;
+			}
 
+			if (move.defender.revealed){
+				float challengeVal = 0;
+				
+				int result = GameHandler.challengeTable[context, (int)move.attacker.type, (int)move.defender.type];
+				
 				switch(result){
 				case(0):
 					challengeVal +=0;
 					break;
 				case(1):
-					challengeVal += Card.subjectiveValues[i];
+					challengeVal += Card.subjectiveValues[(int)move.defender.type];
 					break;
 				case(2):
 					challengeVal -= Card.subjectiveValues[(int)move.attacker.type];
 					break;
 				case(3):
-					challengeVal += Card.subjectiveValues[i];
+					challengeVal += Card.subjectiveValues[(int)move.defender.type];
 					challengeVal -= Card.subjectiveValues[(int)move.attacker.type];
 					break;
 				default:
 					break;
 				}
-				moveVal += probs[i] * challengeVal;
+				moveVal =  challengeVal;
+
 			}
+			else{
+				float[] challengeProbs = move.defender.getPredictionProbabilities();
+
+				//need the chance it being a certain card, the subvalue of that card, and the resolution of a challenge
+				//for each possible defender, represented by i i
+				for (int i = 0; i< challengeProbs.Length; i++){
+					float challengeVal = 0;
+
+					int result = GameHandler.challengeTable[context, (int)move.attacker.type, i];
+
+					switch(result){
+					case(0):
+						challengeVal +=0;
+						break;
+					case(1):
+						challengeVal += Card.subjectiveValues[i];
+						break;
+					case(2):
+						challengeVal -= Card.subjectiveValues[(int)move.attacker.type];
+						break;
+					case(3):
+						challengeVal += Card.subjectiveValues[i];
+						challengeVal -= Card.subjectiveValues[(int)move.attacker.type];
+						break;
+					default:
+						break;
+					}
+					moveVal += challengeProbs[i] * challengeVal;
+
+				}
+
+				//ADD VALUE TO REVEALING WITH LOW VALUE CARDS
+				moveVal += 7-Card.subjectiveValues[(int)move.attacker.type];
+			}
+
+			//SPECIAL CASE: PYTHIA REVEALING A HAND OR COLUMN SHOULD HAVE HIGH VALUE
+			if (move.attacker.type == CardType.PYTHIA){
+				//IF PYTHIA IS PLAYED FROM THE HAND TO HAND
+				if (context == 1){
+					moveVal = otherHand.Length;
+				}
+				//HAND TO FIELD, COUNT CARDS IN THE COLUMN
+				else if(context == 2){
+					int total = 0;
+					for(int i = 0; i<4; i++){
+						if (otherField[i,move.defender.spot.col].card != null)
+							total++;
+					}
+					moveVal = total * 2;
+				}
+			}
+
+
 
 			break;
 		case MoveType.MYTH:
@@ -262,6 +330,21 @@ public class GameState{
 				handChallenge.attacker = c;
 				handChallenge.defender = otherHand[UnityEngine.Random.Range(0, otherHand.Length)];
 				possibleMoves.Add(handChallenge);
+			}
+
+			//Pegasus can challenge the first row
+			if (c.type == CardType.PEGASUS){
+				for (int col = 0; col < 3; col++){
+					if (otherField[0,col].card != null){
+						Move pegChallenge = new Move();
+						pegChallenge.type = MoveType.CHALLENGE;
+						pegChallenge.attacker = c;
+						pegChallenge.defender = otherField[0,col].card;
+						possibleMoves.Add(pegChallenge);
+
+					}
+				}
+
 			}
 
 			if (c.type == CardType.ZEUS){

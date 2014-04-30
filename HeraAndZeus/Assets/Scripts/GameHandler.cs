@@ -240,13 +240,17 @@ public class GameHandler : MonoBehaviour {
 
 		//SPECIAL CASES
 		if (attacker.type == CardType.PYTHIA && context == 1){
+			//result = 4;
+
 			Debug.Log("Special Case: Pythia reveals opponent's hand");
+			GameHandler.Log("PYTHIA used to reveal opponent's hand");
 			activePlayer.actionPoints ++;
 			Card target = null;
 			activePlayer.phase = MythPhase.PYTHIA;
 			foreach (Card c in inactivePlayer.hand){
 				if (c.type == CardType.POSEIDON){
 					target = c;
+					GameHandler.Log("PYTHIA found POSEIDON. POSEIDON is discarded");
 				}
 				c.Flip(true);
 				//c.Reveal(true);
@@ -258,6 +262,7 @@ public class GameHandler : MonoBehaviour {
 			}
 		} else if (attacker.type == CardType.PYTHIA && context == 2) {
 			Debug.Log("Special Case: Pythia reveals opponent's column");
+			GameHandler.Log("PYTHIA used to reveal opponent's column");
 			if (inactivePlayer.FindOnField(defender) != null) {
 				for (int i = 0; i < 4; i++) {
 					FieldSpot spot = inactivePlayer.playField[i, defender.spot.col];
@@ -271,6 +276,8 @@ public class GameHandler : MonoBehaviour {
 			Debug.Log("Special Case: Pandora is Challenged");
 			//if pandora is on the field, discard all from that column
 			if (inactivePlayer.FindOnField(defender)){
+				GameHandler.Log("PANDORA found. Column is discarded on both sides.");
+
 				int defCol = defender.spot.col;
 
 				while (inactivePlayer.playField[0,defCol].card != null){
@@ -283,6 +290,7 @@ public class GameHandler : MonoBehaviour {
 			
 			//if pandora is in hand, discard all in hand
 			else if (inactivePlayer.hand.Contains(defender)){
+				GameHandler.Log("PANDORA found. Opponent's hand discarded.");
 				while(inactivePlayer.hand.Count > 0){
 					inactivePlayer.Discard(inactivePlayer.hand[0]);
 				}
