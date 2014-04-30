@@ -44,6 +44,8 @@ public class Card : MonoBehaviour {
 
 	// prediction array is as long as number of card types	
 	public int[] predictVector = new int[Enum.GetNames(typeof(CardType)).Length-1];
+	public float[] probabilityVector = new float[Enum.GetNames(typeof(CardType)).Length-1];
+	public float[] oldProbabilityVector = new float[Enum.GetNames(typeof(CardType)).Length-1];
 	//public List<CardType> predictList = new List<CardType>();
 	public FieldSpot spot;
 
@@ -89,6 +91,29 @@ public class Card : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// make sure if this card is in the field, it can't have non-zero probability of being a pure magic card
+		if (spot != null) {
+			if (spot.row == 0 && probabilityVector[(int) (CardType.ZEUS)] > 0) {
+				isNotCardType(CardType.ZEUS);
+			}
+
+			if (probabilityVector[(int) (CardType.HADES)] > 0) {
+				isNotCardType(CardType.HADES);
+			}
+
+			if (probabilityVector[(int) (CardType.DIONYSUS)] > 0) {
+				isNotCardType(CardType.DIONYSUS);
+			}
+
+			if (probabilityVector[(int) (CardType.PERSEPHONE)] > 0) {
+				isNotCardType(CardType.PERSEPHONE);
+			}
+
+			if (probabilityVector[(int) (CardType.SIRENS)] > 0) {
+				isNotCardType(CardType.SIRENS);
+			}
+		}
+
 		if (originalScale == Vector3.zero && this.transform.localScale != Vector3.zero) {
 			originalScale = this.transform.localScale;
 			desiredScale = 5 * originalScale;
@@ -132,7 +157,6 @@ public class Card : MonoBehaviour {
 				originalPosition = this.transform.position;
 				moving = false;
 				forceMove = false;
-				if (debug)	Debug.Log("MAKE FORCE MOVE FALSE " + forceMove);
 			}
 		} else {
 			forceMove = false;
@@ -153,22 +177,107 @@ public class Card : MonoBehaviour {
 				predictVector[(int) ctype]++;
 			}
 		}
+
+		setupProbabilityVector();
 	}
 
-	public void clearPredictionVector() {
+	private void setupProbabilityVector() {
+		probabilityVector = new float[Enum.GetNames(typeof(CardType)).Length-1];
+
+		int sum = 0;
+		foreach (int i in predictVector) {
+			sum += i;
+		} 
+
 		for (int i = 0; i < predictVector.Length; i++) {
-			predictVector[i] = 0;
+			probabilityVector[i] = (float) (predictVector[i]) / sum;
+		}
+
+		//oldProbabilityVector = probabilityVector;
+	}
+
+	public void isNotCardType(CardType ct) {
+		updateProbabilityVector(ct, -1, true);
+	}
+
+	public void isCardType(CardType ct) {
+		updateProbabilityVector(ct, 1, true);
+	}
+
+	public void updateProbabilityVector(CardType ct, float amount, bool affectAllCards) {
+		float value = probabilityVector[(int) ct] + amount;
+
+		float correctedAmount = amount;
+		if (value > 1) {
+			correctedAmount -= value - 1;
+		} else if (value < 0) {
+			correctedAmount += 0 - value;
+		}
+
+		//float old = probabilityVector[(int) ct];
+
+		for (int i = 0; i < probabilityVector.Length; i++) {
+			if (i == (int) ct) {
+				updateSingleProbability((CardType) i, correctedAmount);
+			} else {
+				updateSingleProbability((CardType) i, -correctedAmount / (probabilityVector.Length-1) * predictVector[i]);
+			}
+		}
+
+		if (affectAllCards) {
+			float sum = 0;
+			foreach (Card c in owner.allCards) {
+				if (c != this) {
+					sum += c.probabilityVector[(int) ct];
+				}
+			}
+
+			//float total = sum + old;
+			float targetSum = predictVector[(int) ct] - correctedAmount;
+			float sumFactor = targetSum/sum;
+
+			//if (debug) Debug.Log("total " + total + " sum " + sum + " target " + targetSum + " factor " + sumFactor);
+			foreach (Card c in owner.allCards) {
+				if (c != this) {
+					c.updateProbabilityVector(ct, (sumFactor-1) * c.probabilityVector[(int) ct], false);
+				}
+			}
 		}
 	}
 
-	public void updatePredictionVector(CardType ct, int amount) {
-		//Debug.Log(predictVector.Length);
-		predictVector[(int) ct] += amount;
+	private void updateSingleProbability(CardType ct, float amount) {
+		float value = probabilityVector[(int) ct] + amount;
 
-		if (predictVector[(int) ct] < 0) {
-			predictVector[(int) ct] = 0;
+		float correctedAmount = amount;
+		if (value > 1) {
+			correctedAmount -= value - 1;
+		} else if (value < 0) {
+			correctedAmount += 0 - value;
+		}
+
+		probabilityVector[(int) ct] += correctedAmount;
+	}
+
+	public void resetProbabilityVector() {
+		probabilityVector = oldProbabilityVector;
+		for (int i = 0; i < probabilityVector.Length; i++) {
+			if ((CardType) i == type) {
+				foreach (Card c in owner.allCards) {
+					if (c != this) {
+						c.updateProbabilityVector(c.type, (oldProbabilityVector[i]-1)/(owner.allCards.Count-1), false);
+					}
+				}
+			} else {
+				foreach (Card c in owner.allCards) {
+					if (c != this) {
+						c.updateProbabilityVector(c.type, oldProbabilityVector[i]/(owner.allCards.Count-1), false);
+					}
+				}
+			}
 		}
 	}
+
+
 
 	/*public void updatePredictionList(Card card, int amount) {
 		updatePredictionList(card.type, amount);
@@ -191,16 +300,17 @@ public class Card : MonoBehaviour {
 	}*/
 
 	public float[] getPredictionProbabilities() {
-		float[] probabilities = new float[predictVector.Length];
-		int sum = 0;
-		foreach (int i in predictVector) {
-			sum += i;
-		} 
+		// float[] probabilities = new float[predictVector.Length];
+		// int sum = 0;
+		// foreach (int i in predictVector) {
+		// 	sum += i;
+		// } 
 
-		for (int i = 0; i < predictVector.Length; i++) {
-			probabilities[i] = (float) (predictVector[i]) / sum;
-		}
-		return probabilities;
+		// for (int i = 0; i < predictVector.Length; i++) {
+		// 	probabilities[i] = (float) (predictVector[i]) / sum;
+		// }
+		// return probabilities;
+		return probabilityVector;
 	}
 
 	private void DetermineTextVisibility() {
@@ -226,10 +336,14 @@ public class Card : MonoBehaviour {
 			Flip(true);
 			revealed = true;
 			if (debug)	Debug.Log("revealed");
-			this.owner.updateAllCardPredictions(type, -1);
+			oldProbabilityVector = new float[probabilityVector.Length];
+			for (int i = 0; i < probabilityVector.Length; i++) {
+				oldProbabilityVector[i] = probabilityVector[i];
+			}
+			isCardType(type);
 		} else if (!revBool && revealed) {
 			revealed = false;
-			this.owner.updateAllCardPredictions(type, 1);
+			resetProbabilityVector();
 		}
 	}
 
@@ -285,7 +399,7 @@ public class Card : MonoBehaviour {
 
 	public void Flip(bool flipBool) {
 		// only flips the card if it isn't in desired
-		if (flipping){
+		if (flipping) {
 			SetFlip(isFlipped);
 		}
 
@@ -429,6 +543,13 @@ public class Card : MonoBehaviour {
 		data += name;
 		data += "\n";
 
-				return data;
+		data += "\nCard Probabilities:\n";
+		float[] probabilities = probabilityVector;
+		for (int i = 0; i < probabilities.Length; i++) {
+			float probability = (float) (Mathf.Round(probabilities[i] * 10000) / 100);
+			data += "" + (CardType) (i) + "\t\t" + probability + "%\n";
+		}
+
+		return data;
 	}
 }

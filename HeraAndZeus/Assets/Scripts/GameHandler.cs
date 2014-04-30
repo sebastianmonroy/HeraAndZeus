@@ -362,10 +362,10 @@ public class GameHandler : MonoBehaviour {
 		//scrollPosition = GUI.BeginScrollView(new Rect(Screen.width - Screen.width/3,0,Screen.width/3 -20,Screen.height-20), scrollPosition, new Rect(0,0,200,200));
 
 		//scrollPosition = 
-		GUI.BeginGroup(new Rect(Screen.width - Screen.width/3 -10, 10, Screen.width/3, 600));
-			if (GUI.Button(new Rect(Screen.width/3 - 120, 300, 100, 20), "Scroll Lock")){
-				scrollLock = !scrollLock;
-			}
+		GUI.BeginGroup(new Rect(Screen.width - Screen.width/3 -10, 10, Screen.width/3, Screen.height));
+		if (GUI.Button(new Rect(Screen.width/3 - 120, 300, 100, 20), "Scroll Lock")){
+			scrollLock = !scrollLock;
+		}
 		if (GUI.Button(new Rect(Screen.width/3 - 230, 300, 100, 20), "Hover Debug")){
 			debug = !debug;
 		}
@@ -388,8 +388,7 @@ public class GameHandler : MonoBehaviour {
 			GUI.EndScrollView();
 			
 		if (debug){
-			GUI.Box(new Rect(0, 330, Screen.width/3 - 20, 200), cardData);
-
+			GUI.Box(new Rect(0, 330, Screen.width/3 - 20, 300), cardData);
 		}
 
 		GUI.EndGroup();
