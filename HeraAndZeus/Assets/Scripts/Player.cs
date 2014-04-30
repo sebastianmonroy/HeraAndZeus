@@ -73,7 +73,7 @@ public class Player : MonoBehaviour {
 								- transform.forward * Card.height/2
 								- transform.forward * (Card.height + buffer);
 
-		allCards = BuildDrawPile();
+		allCards = new List<Card>(BuildDrawPile());
 
 		Shuffle(drawPile);
 

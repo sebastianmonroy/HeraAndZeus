@@ -110,14 +110,6 @@ public class Card : MonoBehaviour {
 			}
 		}
 
-		if (revealed) {
-			float[] revealVector = new float[Enum.GetNames(typeof(CardType)).Length-1];
-			revealVector[(int) type] = 1;
-			probabilityVector = revealVector;
-		} else {
-			oldProbabilityVector = probabilityVector;
-		}
-
 		if (originalScale == Vector3.zero && this.transform.localScale != Vector3.zero) {
 			originalScale = this.transform.localScale;
 			desiredScale = 5 * originalScale;
@@ -197,7 +189,7 @@ public class Card : MonoBehaviour {
 			probabilityVector[i] = (float) (predictVector[i]) / sum;
 		}
 
-		oldProbabilityVector = probabilityVector;
+		//oldProbabilityVector = probabilityVector;
 	}
 
 	public void isNotCardType(CardType ct) {
@@ -205,32 +197,7 @@ public class Card : MonoBehaviour {
 	}
 
 	public void isCardType(CardType ct) {
-		float amount = 1;
-		bool affectAllCards = true;
-		float value = probabilityVector[(int) ct] + amount;
-
-		float correctedAmount = amount;
-		if (value > 1) {
-			correctedAmount -= value - 1;
-		} else if (value < 0) {
-			correctedAmount += 0 - value;
-		}
-
-		for (int i = 0; i < probabilityVector.Length; i++) {
-			if (i == (int) ct) {
-				updateSingleProbability((CardType) i, correctedAmount);
-			} else {
-				updateSingleProbability((CardType) i, -1);
-			}
-		}
-
-		if (affectAllCards) {
-			foreach (Card c in owner.allCards) {
-				if (c != this) {
-					c.updateProbabilityVector(ct, -correctedAmount/(owner.allCards.Count-1), false);
-				}
-			}
-		}
+		updateProbabilityVector(ct, 1, true);
 	}
 
 	public void updateProbabilityVector(CardType ct, float amount, bool affectAllCards) {
@@ -243,18 +210,32 @@ public class Card : MonoBehaviour {
 			correctedAmount += 0 - value;
 		}
 
+		//float old = probabilityVector[(int) ct];
+
 		for (int i = 0; i < probabilityVector.Length; i++) {
 			if (i == (int) ct) {
 				updateSingleProbability((CardType) i, correctedAmount);
 			} else {
-				updateSingleProbability((CardType) i, -correctedAmount / (probabilityVector.Length-1));
+				updateSingleProbability((CardType) i, -correctedAmount / (probabilityVector.Length-1) * predictVector[i]);
 			}
 		}
 
 		if (affectAllCards) {
+			float sum = 0;
 			foreach (Card c in owner.allCards) {
 				if (c != this) {
-					c.updateProbabilityVector(ct, -correctedAmount/(owner.allCards.Count-1), false);
+					sum += c.probabilityVector[(int) ct];
+				}
+			}
+
+			//float total = sum + old;
+			float targetSum = predictVector[(int) ct] - correctedAmount;
+			float sumFactor = targetSum/sum;
+
+			//if (debug) Debug.Log("total " + total + " sum " + sum + " target " + targetSum + " factor " + sumFactor);
+			foreach (Card c in owner.allCards) {
+				if (c != this) {
+					c.updateProbabilityVector(ct, (sumFactor-1) * c.probabilityVector[(int) ct], false);
 				}
 			}
 		}
@@ -351,6 +332,10 @@ public class Card : MonoBehaviour {
 			Flip(true);
 			revealed = true;
 			if (debug)	Debug.Log("revealed");
+			oldProbabilityVector = new float[probabilityVector.Length];
+			for (int i = 0; i < probabilityVector.Length; i++) {
+				oldProbabilityVector[i] = probabilityVector[i];
+			}
 			isCardType(type);
 		} else if (!revBool && revealed) {
 			revealed = false;
