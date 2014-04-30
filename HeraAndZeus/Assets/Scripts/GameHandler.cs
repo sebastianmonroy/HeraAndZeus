@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using MicrosoftResearch.Infer.Models;
-using MicrosoftResearch.Infer;
 
 public class GameHandler : MonoBehaviour {
 

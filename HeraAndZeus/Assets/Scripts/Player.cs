@@ -1,8 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using MicrosoftResearch.Infer.Models;
-using MicrosoftResearch.Infer;
+
 
 public enum PlayerType {
 	HERA, ZEUS
